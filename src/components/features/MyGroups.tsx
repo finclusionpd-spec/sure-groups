@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Users, Plus, MessageSquare, Settings, Eye } from 'lucide-react';
+import { Search, Users, Plus, MessageSquare, Settings, Eye, Calendar, Star, MapPin } from 'lucide-react';
 
 interface MyGroup {
   id: string;
