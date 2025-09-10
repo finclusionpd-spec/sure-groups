@@ -1,4 +1,4 @@
-import React from 'react';
+// no default React import needed
 import { 
   Home, 
   Users, 
@@ -22,11 +22,9 @@ import {
   Flag,
   BarChart3,
   Briefcase,
-  GraduationCap,
   Heart,
   MapPin,
   Zap,
-  LogOut,
   Database
 } from 'lucide-react';
 import { NavigationGroup } from '../types';
@@ -47,17 +45,14 @@ export const getMemberNavigation = (): NavigationGroup[] => [
       { id: 'accountability-tracking', label: 'Accountability Tracking', icon: Target },
       { id: 'meetings', label: 'Manage Meetings', icon: Users },
       { id: 'votings', label: 'Manage Votings', icon: Target },
-      { id: 'calendar', label: 'Manage Events', icon: Calendar }
+      { id: 'events', label: 'Events', icon: Calendar }
     ]
   },
   {
-    title: 'Benefits & Services',
+    title: 'Services',
     items: [
-      { id: 'discounts-offers', label: 'Discounts & Offers', icon: Gift },
-      { id: 'professional-services', label: 'Professional Services', icon: Briefcase },
-      { id: 'priority-invitations', label: 'Priority Invitations', icon: Calendar },
-      { id: 'marketplace-browse', label: 'Browse Marketplace', icon: ShoppingCart },
-      { id: 'marketplace-orders', label: 'My Orders', icon: ShoppingCart }
+      { id: 'marketplace', label: 'Marketplace', icon: ShoppingCart },
+      { id: 'orders', label: 'Orders', icon: ShoppingCart }
     ]
   },
   {
@@ -71,6 +66,7 @@ export const getMemberNavigation = (): NavigationGroup[] => [
     title: 'Financial Services',
     items: [
       { id: 'wallet', label: 'Wallet (Sure Banker)', icon: CreditCard },
+      { id: 'donations', label: 'Donations', icon: Heart },
       { id: 'rewards-referrals', label: 'Rewards & Referrals', icon: Award }
     ]
   },

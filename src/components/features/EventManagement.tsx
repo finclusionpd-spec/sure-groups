@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Calendar, MapPin, Users, Clock, Edit, Trash2, Eye } from 'lucide-react';
+import { Search, Plus, Calendar, MapPin, Users, Clock, Edit, Trash2, Eye, CalendarDays, ChevronLeft, ChevronRight, Bell, ExternalLink } from 'lucide-react';
 import { EventData } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -57,6 +57,8 @@ export const EventManagement: React.FC = () => {
   const [groupFilter, setGroupFilter] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [calendarDate, setCalendarDate] = useState(new Date());
   const [newEvent, setNewEvent] = useState({
     title: '',
     description: '',
@@ -118,11 +120,52 @@ export const EventManagement: React.FC = () => {
   // Check if user can create events (only admins can create)
   const canCreateEvents = user?.role && ['super-admin', 'product-admin', 'group-admin'].includes(user.role);
 
+  const exportToGoogleCalendar = (e: EventData) => {
+    const start = new Date(`${e.date}T${e.time}:00`);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const details = encodeURIComponent(e.description || '');
+    const location = encodeURIComponent(e.location || '');
+    const text = encodeURIComponent(e.title);
+    const dates = `${start.toISOString().replace(/[-:]|\.\d{3}/g, '')}/${end.toISOString().replace(/[-:]|\.\d{3}/g, '')}`;
+    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}&location=${location}&sf=true&output=xml`;
+    window.open(url, '_blank');
+  };
+
+  const notifyUpcoming = (e: EventData) => {
+    try {
+      // Simple in-app notification using alert for demo
+      alert(`Reminder set for ${e.title} on ${new Date(e.date).toLocaleDateString()} at ${e.time}`);
+    } catch {}
+  };
+
+  const daysInMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  const firstDayOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+  const monthEvents = events.filter(e => {
+    const dt = new Date(e.date);
+    return dt.getFullYear() === calendarDate.getFullYear() && dt.getMonth() === calendarDate.getMonth();
+  });
+  const eventsByDay = monthEvents.reduce<Record<number, EventData[]>>((acc, e) => {
+    const dt = new Date(e.date);
+    const day = dt.getDate();
+    acc[day] = acc[day] || [];
+    acc[day].push(e);
+    return acc;
+  }, {});
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Event Management</h1>
-        <p className="text-gray-600">Create and manage group events</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Events</h1>
+          <p className="text-gray-600">Browse and manage your group events</p>
+        </div>
+        <button
+          onClick={() => setView(view === 'list' ? 'calendar' : 'list')}
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm inline-flex items-center hover:bg-gray-50"
+          aria-label="Toggle Calendar View"
+        >
+          <CalendarDays className="w-4 h-4 mr-2" /> {view === 'list' ? 'Calendar View' : 'List View'}
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -165,21 +208,31 @@ export const EventManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters / Calendar Controls */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
-              />
+          {view === 'list' ? (
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center space-x-3">
+              <button onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1))} className="p-2 border rounded-lg hover:bg-gray-50"><ChevronLeft className="w-4 h-4" /></button>
+              <div className="text-sm font-medium text-gray-700 w-40 text-center">
+                {calendarDate.toLocaleString(undefined, { month: 'long', year: 'numeric' })}
+              </div>
+              <button onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1))} className="p-2 border rounded-lg hover:bg-gray-50"><ChevronRight className="w-4 h-4" /></button>
+            </div>
+          )}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -213,9 +266,10 @@ export const EventManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredEvents.map((event) => (
+      {/* List View */}
+      {view === 'list' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event) => (
           <div key={event.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
@@ -257,6 +311,8 @@ export const EventManagement: React.FC = () => {
                 >
                   <Eye className="w-4 h-4" />
                 </button>
+                <button onClick={() => notifyUpcoming(event)} className="text-emerald-700 hover:text-emerald-900"><Bell className="w-4 h-4" /></button>
+                <button onClick={() => exportToGoogleCalendar(event)} className="text-gray-700 hover:text-gray-900"><ExternalLink className="w-4 h-4" /></button>
                 
                 {canCreateEvents && (
                   <>
@@ -304,8 +360,42 @@ export const EventManagement: React.FC = () => {
               )}
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* Calendar View */}
+      {view === 'calendar' && (
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="grid grid-cols-7 gap-2 text-center text-xs text-gray-600 mb-2">
+            {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (<div key={d} className="font-medium">{d}</div>))}
+          </div>
+          <div className="grid grid-cols-7 gap-2">
+            {Array.from({ length: firstDayOfMonth(calendarDate) }).map((_, idx) => (
+              <div key={`empty-${idx}`} className="h-24" />
+            ))}
+            {Array.from({ length: daysInMonth(calendarDate) }).map((_, idx) => {
+              const day = idx + 1;
+              const evts = eventsByDay[day] || [];
+              return (
+                <div key={day} className={`h-24 border rounded-lg p-1 ${evts.length ? 'border-blue-300 bg-blue-50' : 'border-gray-200'}`}>
+                  <div className="text-xs font-medium text-gray-700">{day}</div>
+                  <div className="space-y-1 mt-1 overflow-y-auto max-h-16">
+                    {evts.map(e => (
+                      <button key={e.id} onClick={() => setSelectedEvent(e)} className="w-full text-left text-[11px] px-1 py-0.5 rounded bg-white border border-blue-200 hover:bg-blue-100">
+                        {e.title}
+                      </button>
+                    ))}
+                    {evts.length === 0 && (
+                      <div className="text-[10px] text-gray-400">No events</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Create Event Modal */}
       {showCreateModal && canCreateEvents && (

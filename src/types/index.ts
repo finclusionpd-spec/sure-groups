@@ -156,6 +156,27 @@ export interface Transaction {
   createdAt: string;
 }
 
+// Donations
+export type DonationType = 'general' | 'campaign' | 'custom';
+
+export interface DonationRecord {
+  id: string;
+  donorUserId: string;
+  donorUserName: string;
+  amount: number;
+  currency: string;
+  donationType: DonationType;
+  campaignId?: string;
+  campaignName?: string;
+  note?: string;
+  transactionId: string;
+  createdAt: string;
+  recurring?: {
+    cadence: 'weekly' | 'monthly';
+    nextRunAt: string;
+  };
+}
+
 // Vendor Types
 export interface VendorService {
   id: string;

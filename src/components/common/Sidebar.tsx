@@ -18,11 +18,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect,
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const handleItemClick = (itemId: string) => {
-    if (itemId === 'dashboard') {
-      // Handle dashboard navigation if needed
-      return;
-    }
     if (onFeatureSelect) {
+      // Send 'dashboard' through to allow parent to reset view
       onFeatureSelect(itemId);
     }
     setIsOpen(false); // Close mobile sidebar

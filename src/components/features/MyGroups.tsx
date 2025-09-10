@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Users, Plus, MessageSquare, Settings, Eye, Calendar, Star, MapPin } from 'lucide-react';
+import { Search, Users, MessageSquare, Eye, Calendar } from 'lucide-react';
 
 interface MyGroup {
   id: string;
@@ -41,8 +41,11 @@ export const MyGroups: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'my-groups' | 'discover' | 'invites'>('my-groups');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [chatGroupId, setChatGroupId] = useState<string | null>(null);
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<Record<string, { sender: 'me' | 'group'; text: string; ts: string }[]>>({});
   
-  const [myGroups] = useState<MyGroup[]>([
+  const [myGroups, setMyGroups] = useState<MyGroup[]>([
     {
       id: '1',
       name: 'Tech Workers Union',
@@ -102,7 +105,7 @@ export const MyGroups: React.FC = () => {
     }
   ]);
 
-  const [availableGroups] = useState<AvailableGroup[]>([
+  const [availableGroups, setAvailableGroups] = useState<AvailableGroup[]>([
     {
       id: '4',
       name: 'Tech Innovators Hub',
@@ -136,6 +139,23 @@ export const MyGroups: React.FC = () => {
   ]);
 
   const [joinRequests, setJoinRequests] = useState<string[]>([]);
+  const [invitations, setInvitations] = useState<AvailableGroup[]>([
+    {
+      id: '6',
+      name: 'Community Care',
+      description: 'Volunteer group focused on community outreach and support',
+      category: 'Community Service',
+      memberCount: 412,
+      location: 'Lagos, Nigeria',
+      rating: 4.7,
+      isPrivate: true,
+      requiresApproval: false,
+      tags: ['Outreach', 'Charity'],
+      adminName: 'Mary Ann',
+      createdDate: '2024-10-01',
+      profileImage: 'https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=150'
+    }
+  ]);
 
   const filteredMyGroups = myGroups.filter(group => {
     const matchesSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,13 +172,70 @@ export const MyGroups: React.FC = () => {
   });
 
   const handleJoinGroup = (groupId: string) => {
-    setJoinRequests([...joinRequests, groupId]);
+    const target = availableGroups.find(g => g.id === groupId);
+    if (!target) return;
+    if (!target.requiresApproval) {
+      setMyGroups([
+        ...myGroups,
+        {
+          id: target.id,
+          name: target.name,
+          description: target.description,
+          category: target.category,
+          memberCount: target.memberCount,
+          location: target.location,
+          tier: 'basic',
+          isJoined: true,
+          role: 'member',
+          joinDate: new Date().toISOString().slice(0, 10),
+          lastActivity: new Date().toISOString(),
+          unreadMessages: 0,
+          upcomingEvents: 0,
+          imageUrl: target.profileImage,
+          tags: target.tags,
+          isVerified: true,
+          isActive: true
+        }
+      ]);
+      setAvailableGroups(availableGroups.filter(g => g.id !== groupId));
+      alert('Joined group successfully');
+    } else {
+      if (joinRequests.includes(groupId)) return;
+      setJoinRequests([...joinRequests, groupId]);
+      setTimeout(() => {
+        setMyGroups(prev => ([
+          ...prev,
+          {
+            id: target.id,
+            name: target.name,
+            description: target.description,
+            category: target.category,
+            memberCount: target.memberCount,
+            location: target.location,
+            tier: 'basic',
+            isJoined: true,
+            role: 'member',
+            joinDate: new Date().toISOString().slice(0, 10),
+            lastActivity: new Date().toISOString(),
+            unreadMessages: 0,
+            upcomingEvents: 0,
+            imageUrl: target.profileImage,
+            tags: target.tags,
+            isVerified: false,
+            isActive: true
+          }
+        ]));
+        setAvailableGroups(prev => prev.filter(g => g.id !== groupId));
+        setJoinRequests(prev => prev.filter(id => id !== groupId));
+        alert('Your request was approved and the group has been added to My Groups');
+      }, 2000);
+    }
   };
 
-  const handleLeaveGroup = (groupId: string) => {
-    console.log('Leaving group:', groupId);
-    alert('Left group successfully');
-  };
+  // const handleLeaveGroup = (groupId: string) => {
+  //   console.log('Leaving group:', groupId);
+  //   alert('Left group successfully');
+  // };
 
   const categories = ['all', 'Professional', 'Residential', 'Church', 'Health', 'Community Service', 'Sports'];
 
@@ -188,16 +265,8 @@ export const MyGroups: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">My Groups</h1>
-            <p className="text-gray-600">Manage and organize your community groups</p>
-          </div>
-          <button className="bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-teal-600 transition-all duration-200 flex items-center space-x-2 shadow-lg">
-            <Plus className="w-5 h-5" />
-            <span className="font-medium">Create Group</span>
-          </button>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">My Groups</h1>
+        <p className="text-gray-600">Manage and organize your community groups</p>
       </div>
 
       {/* Stats Cards */}
@@ -235,7 +304,7 @@ export const MyGroups: React.FC = () => {
               <p className="text-sm font-medium text-gray-600">Available Groups</p>
               <p className="text-2xl font-bold text-orange-600">{availableGroups.length}</p>
             </div>
-            <Plus className="w-8 h-8 text-orange-500" />
+            <Users className="w-8 h-8 text-orange-500" />
           </div>
         </div>
       </div>
@@ -367,6 +436,8 @@ export const MyGroups: React.FC = () => {
                   <span className="font-medium">{group.memberCount} members</span>
                   <span className="mx-2">•</span>
                   <span>{group.category}</span>
+                  <span className="mx-2">•</span>
+                  <span className="text-blue-600 font-medium">{group.unreadMessages} unread</span>
                 </div>
 
                 {/* Tags */}
@@ -380,16 +451,13 @@ export const MyGroups: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex space-x-2">
-                  <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center space-x-1">
+                  <button onClick={() => setChatGroupId(group.id)} className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center space-x-1">
                     <MessageSquare className="w-4 h-4" />
                     <span>Chat</span>
                   </button>
                   <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center justify-center space-x-1">
                     <Eye className="w-4 h-4" />
                     <span>View</span>
-                  </button>
-                  <button className="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors">
-                    <Settings className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -472,10 +540,82 @@ export const MyGroups: React.FC = () => {
 
       {/* Invitations Tab */}
       {activeTab === 'invites' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Pending Invitations</h3>
-          <p className="text-gray-500">You don't have any pending group invitations at the moment.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {invitations.map((group) => (
+            <div key={group.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 group">
+              <div className="relative h-40 overflow-hidden">
+                <img src={group.profileImage} alt={group.name} className="w-full h-full object-cover" />
+              </div>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900">{group.name}</h3>
+                <p className="text-sm text-gray-600 mb-3">{group.description}</p>
+                <div className="text-sm text-gray-600 mb-4"><Users className="w-4 h-4 inline mr-1" /> {group.memberCount} members</div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => {
+                      setMyGroups([
+                        ...myGroups,
+                        {
+                          id: group.id,
+                          name: group.name,
+                          description: group.description,
+                          category: group.category,
+                          memberCount: group.memberCount,
+                          location: group.location,
+                          tier: 'basic',
+                          isJoined: true,
+                          role: 'member',
+                          joinDate: new Date().toISOString().slice(0, 10),
+                          lastActivity: new Date().toISOString(),
+                          unreadMessages: 0,
+                          upcomingEvents: 0,
+                          imageUrl: group.profileImage,
+                          tags: group.tags,
+                          isVerified: true,
+                          isActive: true
+                        }
+                      ]);
+                      setInvitations(invitations.filter(i => i.id !== group.id));
+                    }}
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm"
+                  >Accept</button>
+                  <button
+                    onClick={() => setInvitations(invitations.filter(i => i.id !== group.id))}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 text-sm"
+                  >Decline</button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {invitations.length === 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Pending Invitations</h3>
+              <p className="text-gray-500">You don't have any pending group invitations at the moment.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Chat Modal */}
+      {chatGroupId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Group Chat</h3>
+              <button onClick={() => setChatGroupId(null)} className="text-gray-400 hover:text-gray-600">×</button>
+            </div>
+            <div className="space-y-2 mb-4">
+              {(chatMessages[chatGroupId] || []).map((m: { sender: 'me' | 'group'; text: string; ts: string }, idx: number) => (
+                <div key={idx} className={`p-2 rounded-lg text-sm ${m.sender==='me' ? 'bg-blue-50 text-blue-900 ml-12' : 'bg-gray-100 text-gray-800 mr-12'}`}>{m.text}</div>
+              ))}
+            </div>
+            <div className="flex items-center space-x-2">
+              <input value={chatInput} onChange={e=>setChatInput(e.target.value)} className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Type a message..." />
+              <button onClick={() => { if (!chatGroupId || !chatInput.trim()) return; const newMsg={ sender: 'me' as const, text: chatInput.trim(), ts: new Date().toISOString() }; const next=[...(chatMessages[chatGroupId]||[]), newMsg]; setChatMessages({ ...chatMessages, [chatGroupId]: next }); localStorage.setItem(`sure-chat-${chatGroupId}`, JSON.stringify(next)); setChatInput(''); }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Send</button>
+              <a href={`https://wa.me/?text=${encodeURIComponent('Hello from SureGroups!')}`} target="_blank" rel="noreferrer" className="px-3 py-2 border border-green-600 text-green-700 rounded-lg text-sm">WhatsApp</a>
+            </div>
+          </div>
         </div>
       )}
     </div>

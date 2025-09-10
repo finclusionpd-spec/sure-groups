@@ -16,51 +16,51 @@ export const UserTourGuide: React.FC = () => {
   const tourSteps: TourStep[] = [
     {
       id: '1',
-      title: 'Welcome to Group Administration',
-      description: 'Your comprehensive platform for managing groups, members, and community engagement.',
-      feature: 'Dashboard Overview',
+      title: 'Welcome to SureGroups (Member)',
+      description: 'Explore your dashboard, see updates, and quick actions built for members.',
+      feature: 'Member Dashboard',
       completed: false
     },
     {
       id: '2',
-      title: 'Group Setup & Management',
-      description: 'Configure your group settings, rules, and visual identity.',
-      feature: 'Group Setup',
+      title: 'My Groups',
+      description: 'Browse your groups, unread messages, and upcoming events. Discover new groups and manage invitations.',
+      feature: 'My Groups',
       completed: false
     },
     {
       id: '3',
-      title: 'Member Management',
-      description: 'Approve members, manage roles, and track member activity.',
-      feature: 'Membership Management',
+      title: 'Marketplace & Orders',
+      description: 'Find deals and professional services. Review and track your orders.',
+      feature: 'Marketplace, Orders',
       completed: false
     },
     {
       id: '4',
-      title: 'Performance Tracking',
-      description: 'Monitor group engagement, attendance, and contribution metrics.',
-      feature: 'Performance Analytics',
+      title: 'Wallet & Donations',
+      description: 'Check your SureBanker Wallet, donate to general causes or campaigns, and download receipts.',
+      feature: 'Wallet, Donations',
       completed: false
     },
     {
       id: '5',
-      title: 'Content Oversight',
-      description: 'Review and moderate group content to maintain community standards.',
-      feature: 'Content Moderation',
+      title: 'Events & Calendar',
+      description: 'View upcoming events in list or calendar view. RSVP and set reminders.',
+      feature: 'Events',
       completed: false
     },
     {
       id: '6',
-      title: 'Financial Management',
-      description: 'Manage group wallet, transactions, and member contributions.',
-      feature: 'Wallet Management',
+      title: 'Notifications & Chat',
+      description: 'Stay on top of updates and chat with your groups. Enable notifications.',
+      feature: 'Notifications, Chat',
       completed: false
     },
     {
       id: '7',
-      title: 'Events & Communication',
-      description: 'Create events, send notifications, and manage group communications.',
-      feature: 'Event Management',
+      title: 'Profile & Reviews',
+      description: 'Manage your profile and leave ratings/reviews for services.',
+      feature: 'Profile, Ratings & Reviews',
       completed: false
     }
   ];
@@ -103,8 +103,8 @@ export const UserTourGuide: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Group Admin Tour Guide</h1>
-        <p className="text-gray-600">Get familiar with group administration features and capabilities</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Member Tour Guide</h1>
+        <p className="text-gray-600">Get familiar with key member features and capabilities</p>
       </div>
 
       {/* Progress Overview */}
@@ -226,35 +226,34 @@ export const UserTourGuide: React.FC = () => {
         </div>
       )}
 
-      {/* Feature Highlights */}
+      {/* Feature Highlights (Member) */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Group Administration</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">My Groups</h3>
           <ul className="space-y-2 text-sm text-gray-600">
-            <li>• Set up and configure your group</li>
-            <li>• Manage member approvals and roles</li>
-            <li>• Track performance and engagement</li>
-            <li>• Moderate content and discussions</li>
+            <li>• Overview of your groups and unread messages</li>
+            <li>• Discover and request to join new groups</li>
+            <li>• Accept or decline invitations</li>
+            <li>• Chat with group members</li>
           </ul>
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Financial Management</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Marketplace & Orders</h3>
           <ul className="space-y-2 text-sm text-gray-600">
-            <li>• Manage group wallet and funds</li>
-            <li>• Process member contributions</li>
-            <li>• Handle marketplace transactions</li>
-            <li>• Distribute benefits and rewards</li>
+            <li>• Browse products, discounts and professional services</li>
+            <li>• Place orders and track delivery status</li>
+            <li>• View and download receipts</li>
           </ul>
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Communication & Events</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Wallet, Donations & Events</h3>
           <ul className="space-y-2 text-sm text-gray-600">
-            <li>• Create and manage events</li>
-            <li>• Send group notifications</li>
-            <li>• Moderate chat discussions</li>
-            <li>• Handle member feedback</li>
+            <li>• Check wallet balance and transaction history</li>
+            <li>• Donate to causes and download receipts</li>
+            <li>• Switch between list and calendar views for events</li>
+            <li>• RSVP and set reminders</li>
           </ul>
         </div>
       </div>

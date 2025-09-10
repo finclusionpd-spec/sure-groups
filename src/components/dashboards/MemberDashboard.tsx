@@ -68,6 +68,10 @@ export const MemberDashboard: React.FC = () => {
   ];
 
   const handleFeatureSelect = (featureId: string) => {
+    if (featureId === 'dashboard') {
+      setActiveFeature(null);
+      return;
+    }
     setActiveFeature(featureId);
   };
 
@@ -81,19 +85,19 @@ export const MemberDashboard: React.FC = () => {
         setActiveFeature('my-groups');
         break;
       case 'browse-marketplace':
-        setActiveFeature('marketplace-browse');
+        setActiveFeature('marketplace');
         break;
       case 'send-money':
         setActiveFeature('wallet');
         break;
       case 'browse-events':
-        setActiveFeature('priority-invitations');
+        setActiveFeature('events');
         break;
       case 'my-orders':
-        setActiveFeature('marketplace-orders');
+        setActiveFeature('orders');
         break;
       case 'vendor-services':
-        setActiveFeature('professional-services');
+        setActiveFeature('marketplace');
         break;
       case 'marketplace-deals':
         setActiveFeature('discounts-offers');

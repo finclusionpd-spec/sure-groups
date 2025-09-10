@@ -207,7 +207,7 @@ export const MyOrders: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">My Orders</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Orders</h1>
         <p className="text-gray-600">Track your marketplace orders and purchase history</p>
       </div>
 

@@ -13,6 +13,7 @@ import { TransactionManagement } from '../features/TransactionManagement';
 import { UserTourGuide } from '../features/UserTourGuide';
 import { MyGroups } from '../features/MyGroups';
 import { MyOrders } from '../features/MyOrders';
+import { Marketplace } from '../features/Marketplace';
 import { ContentCollaboration } from '../features/ContentCollaboration';
 import { AccountabilityTracking } from '../features/AccountabilityTracking';
 import { DiscountsOffers } from '../features/DiscountsOffers';
@@ -54,8 +55,7 @@ import { UsageMonitoring } from '../features/UsageMonitoring';
 import { DeveloperProfile } from '../features/DeveloperProfile';
 import { ComplianceCenter } from '../features/ComplianceCenter';
 import { DeveloperRatings } from '../features/DeveloperRatings';
-import { DeveloperChat } from '../features/DeveloperChat';
-import { HelpCenter } from '../features/HelpCenter';
+// removed unused imports DeveloperChat, HelpCenter
 import { VendorMarketplace } from '../features/VendorMarketplace';
 import { GroupOverview } from '../features/GroupOverview';
 import { SystemSettings } from '../features/SystemSettings';
@@ -66,6 +66,7 @@ import { BackupRecovery } from '../features/BackupRecovery';
 import { DatabaseManagement } from '../features/DatabaseManagement';
 import { Meetings } from '../features/Meetings';
 import { Votings } from '../features/Votings';
+import { Donations } from '../features/Donations';
 
 interface FeatureRouterProps {
   featureId: string;
@@ -87,9 +88,9 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <ProfessionalServices />;
     case 'priority-invitations':
       return <PriorityInvitations />;
-    case 'marketplace-browse':
-      return <DiscountsOffers />;
-    case 'marketplace-orders':
+    case 'marketplace':
+      return <Marketplace />;
+    case 'orders':
       return <MyOrders />;
     case 'dispute-management':
       return <DisputeManagement />;
@@ -97,6 +98,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <ReportsFlags />;
     case 'wallet':
       return <Wallet />;
+    case 'donations':
+      return <Donations />;
     case 'rewards-referrals':
       return <RewardsReferrals />;
     case 'notifications-alerts':
@@ -111,7 +114,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <Meetings />;
     case 'votings':
       return <Votings />;
-    case 'calendar':
+    case 'events':
       return <EventManagement />;
    case 'chats':
      return <ChatMessaging />;
@@ -220,8 +223,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <TicketingSystem />;
     case 'group-management':
       return <GroupManagement />;
-    case 'approval-workflow':
-      return <ApprovalWorkflow />;
+    // Removed 'approval-workflow' explicit component to avoid missing import; falling back to default placeholder
     case 'event-management':
       return <EventManagement />;
     case 'feature-management':
