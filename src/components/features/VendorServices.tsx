@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye, Users, ToggleLeft, ToggleRight, Star, Package, DollarSign } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Plus, Edit, Trash2, Eye, ToggleLeft, ToggleRight, Star, Package, DollarSign, Upload, X } from 'lucide-react';
 import { VendorService } from '../../types';
 
 export const VendorServices: React.FC = () => {
+  const LOCAL_STORAGE_KEY = 'sure-groups-vendor-services';
   const [services, setServices] = useState<VendorService[]>([
     {
       id: '1',
@@ -10,7 +11,7 @@ export const VendorServices: React.FC = () => {
       description: 'Complete health checkup including blood tests, vitals, and consultation with certified medical professionals.',
       category: 'Health Services',
       price: 125.00,
-      currency: 'USD',
+      currency: 'NGN',
       status: 'active',
       connectedGroups: ['Community Church', 'Youth Ministry'],
       imageUrl: 'https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -25,7 +26,7 @@ export const VendorServices: React.FC = () => {
       description: 'One-on-one consultation with certified business advisors for strategic planning and growth.',
       category: 'Professional Services',
       price: 75.00,
-      currency: 'USD',
+      currency: 'NGN',
       status: 'active',
       connectedGroups: ['Local Union Chapter'],
       imageUrl: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -40,7 +41,7 @@ export const VendorServices: React.FC = () => {
       description: 'Comprehensive course covering SEO, social media marketing, PPC, and analytics for modern businesses.',
       category: 'Training & Education',
       price: 149.00,
-      currency: 'USD',
+      currency: 'NGN',
       status: 'pending',
       connectedGroups: ['Tech Professionals'],
       imageUrl: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -62,13 +63,23 @@ export const VendorServices: React.FC = () => {
     description: '',
     category: '',
     price: '',
+    availability: true,
     connectedGroups: [] as string[]
   });
 
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
+  const [formErrors, setFormErrors] = useState<{ name?: string; description?: string; price?: string; category?: string }>({});
+
   const categories = [
+    'Product',
+    'Professional Service',
+    'Discount',
+    'Offer',
+    'Training',
     'Health Services',
-    'Professional Services', 
-    'Training & Education',
     'Financial Services',
     'Technology Services',
     'Consulting',
@@ -84,6 +95,24 @@ export const VendorServices: React.FC = () => {
     'Business Network'
   ];
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as VendorService[];
+        if (Array.isArray(parsed)) {
+          setServices(prev => (parsed.length > 0 ? parsed : prev));
+        }
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(services));
+    } catch {}
+  }, [services]);
+
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -92,21 +121,57 @@ export const VendorServices: React.FC = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const handleCreateService = () => {
+  const readFilesAsDataUrls = (files: File[]): Promise<string[]> => {
+    return Promise.all(files.map(file => new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    })));
+  };
+
+  const validateForm = (): boolean => {
+    const errors: { name?: string; description?: string; price?: string; category?: string } = {};
+    if (!newService.name.trim()) errors.name = 'Service name is required';
+    if (!newService.description.trim()) errors.description = 'Description is required';
+    if (!newService.category.trim()) errors.category = 'Category is required';
+    if (newService.price === '' || isNaN(Number(newService.price))) errors.price = 'Price must be a number';
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCreateService = async () => {
+    if (!validateForm()) return;
+
+    const [images, videos] = await Promise.all([
+      readFilesAsDataUrls(imageFiles),
+      readFilesAsDataUrls(videoFiles)
+    ]);
+
     const service: VendorService = {
       id: Date.now().toString(),
-      ...newService,
+      name: newService.name.trim(),
+      description: newService.description.trim(),
+      category: newService.category,
       price: parseFloat(newService.price) || 0,
-      currency: 'USD',
-      status: 'pending',
-      imageUrl: 'https://images.pexels.com/photos/259027/pexels-photo-259027.jpeg?auto=compress&cs=tinysrgb&w=600',
+      currency: 'NGN',
+      status: newService.availability ? 'active' : 'inactive',
+      connectedGroups: newService.connectedGroups,
+      imageUrl: images[0] || 'https://images.pexels.com/photos/259027/pexels-photo-259027.jpeg?auto=compress&cs=tinysrgb&w=600',
+      images,
+      videos,
       rating: 0,
       reviewCount: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     setServices([service, ...services]);
-    setNewService({ name: '', description: '', category: '', price: '', connectedGroups: [] });
+    setNewService({ name: '', description: '', category: '', price: '', availability: true, connectedGroups: [] });
+    setImageFiles([]);
+    setImagePreviews([]);
+    setVideoFiles([]);
+    setVideoPreviews([]);
+    setFormErrors({});
     setShowCreateModal(false);
   };
 
@@ -239,7 +304,7 @@ export const VendorServices: React.FC = () => {
           <div key={service.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
             <div className="relative">
               <img 
-                src={service.imageUrl} 
+                src={(service.images && service.images[0]) || service.imageUrl} 
                 alt={service.name}
                 className="w-full h-48 object-cover"
               />
@@ -326,7 +391,7 @@ export const VendorServices: React.FC = () => {
       {/* Create Service Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Service</h3>
             <div className="space-y-4">
               <div>
@@ -338,6 +403,7 @@ export const VendorServices: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter service name"
                 />
+                {formErrors.name && <p className="mt-1 text-xs text-red-600">{formErrors.name}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -348,6 +414,7 @@ export const VendorServices: React.FC = () => {
                   rows={3}
                   placeholder="Describe your service"
                 />
+                {formErrors.description && <p className="mt-1 text-xs text-red-600">{formErrors.description}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -361,9 +428,10 @@ export const VendorServices: React.FC = () => {
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
+                {formErrors.category && <p className="mt-1 text-xs text-red-600">{formErrors.category}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price (USD)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price (NGN)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -372,6 +440,95 @@ export const VendorServices: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.00"
                 />
+                {formErrors.price && <p className="mt-1 text-xs text-red-600">{formErrors.price}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Images</label>
+                <div className="flex items-center justify-between gap-4">
+                  <label className="flex items-center space-x-2 px-3 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <Upload className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm text-gray-700">Select Images</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        setImageFiles(prev => [...prev, ...files]);
+                        files.forEach(file => {
+                          const reader = new FileReader();
+                          reader.onload = () => setImagePreviews(prev => [...prev, reader.result as string]);
+                          reader.readAsDataURL(file);
+                        });
+                      }}
+                    />
+                  </label>
+                  <span className="text-xs text-gray-500">You can upload multiple images</span>
+                </div>
+                {imagePreviews.length > 0 && (
+                  <div className="mt-3 grid grid-cols-3 md:grid-cols-4 gap-2">
+                    {imagePreviews.map((src, idx) => (
+                      <div key={idx} className="relative">
+                        <img src={src} alt={`preview-${idx}`} className="w-full h-24 object-cover rounded-lg border" />
+                        <button
+                          type="button"
+                          className="absolute -top-2 -right-2 bg-white border rounded-full p-1 shadow hover:bg-gray-50"
+                          onClick={() => {
+                            setImagePreviews(prev => prev.filter((_, i) => i !== idx));
+                            setImageFiles(prev => prev.filter((_, i) => i !== idx));
+                          }}
+                        >
+                          <X className="w-3 h-3 text-gray-600" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Videos (optional)</label>
+                <div className="flex items-center justify-between gap-4">
+                  <label className="flex items-center space-x-2 px-3 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <Upload className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm text-gray-700">Select Videos</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        setVideoFiles(prev => [...prev, ...files]);
+                        files.forEach(file => {
+                          const reader = new FileReader();
+                          reader.onload = () => setVideoPreviews(prev => [...prev, reader.result as string]);
+                          reader.readAsDataURL(file);
+                        });
+                      }}
+                    />
+                  </label>
+                  <span className="text-xs text-gray-500">Short promo/demo videos recommended</span>
+                </div>
+                {videoPreviews.length > 0 && (
+                  <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {videoPreviews.map((src, idx) => (
+                      <div key={idx} className="relative">
+                        <video src={src} className="w-full h-24 object-cover rounded-lg border" controls />
+                        <button
+                          type="button"
+                          className="absolute -top-2 -right-2 bg-white border rounded-full p-1 shadow hover:bg-gray-50"
+                          onClick={() => {
+                            setVideoPreviews(prev => prev.filter((_, i) => i !== idx));
+                            setVideoFiles(prev => prev.filter((_, i) => i !== idx));
+                          }}
+                        >
+                          <X className="w-3 h-3 text-gray-600" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Connect to Groups</label>
@@ -394,6 +551,19 @@ export const VendorServices: React.FC = () => {
                     </label>
                   ))}
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                <button
+                  type="button"
+                  onClick={() => setNewService({...newService, availability: !newService.availability})}
+                  className={`inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-full ${
+                    newService.availability ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {newService.availability ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
+                  <span>{newService.availability ? 'Active' : 'Inactive'}</span>
+                </button>
               </div>
             </div>
             <div className="flex justify-end space-x-3 mt-6">
@@ -420,7 +590,7 @@ export const VendorServices: React.FC = () => {
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="relative">
               <img 
-                src={selectedService.imageUrl} 
+                src={(selectedService.images && selectedService.images[0]) || selectedService.imageUrl} 
                 alt={selectedService.name}
                 className="w-full h-64 object-cover"
               />
@@ -453,6 +623,22 @@ export const VendorServices: React.FC = () => {
               </div>
 
               <p className="text-gray-700 mb-6">{selectedService.description}</p>
+
+              {selectedService.images && selectedService.images.length > 1 && (
+                <div className="mb-6 grid grid-cols-3 gap-2">
+                  {selectedService.images.slice(1).map((img, idx) => (
+                    <img key={idx} src={img} alt={`image-${idx}`} className="w-full h-24 object-cover rounded" />
+                  ))}
+                </div>
+              )}
+
+              {selectedService.videos && selectedService.videos.length > 0 && (
+                <div className="mb-6 grid grid-cols-2 gap-2">
+                  {selectedService.videos.map((vid, idx) => (
+                    <video key={idx} src={vid} className="w-full h-32 object-cover rounded" controls />
+                  ))}
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>

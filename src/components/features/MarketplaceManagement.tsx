@@ -305,7 +305,7 @@ export const MarketplaceManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Revenue</p>
-              <p className="text-2xl font-bold text-purple-600">${totalRevenue.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-purple-600">₦{totalRevenue.toFixed(2)}</p>
             </div>
             <DollarSign className="w-8 h-8 text-purple-500" />
           </div>
@@ -412,7 +412,7 @@ export const MarketplaceManagement: React.FC = () => {
               </div>
               <div className="p-3 bg-purple-50 rounded border">
                 <div className="text-gray-600">Sales Volume</div>
-                <div className="text-2xl font-bold text-purple-700 mt-1">${totalRevenue.toFixed(2)}</div>
+                <div className="text-2xl font-bold text-purple-700 mt-1">₦{totalRevenue.toFixed(2)}</div>
               </div>
               <div className="p-3 bg-green-50 rounded border">
                 <div className="text-gray-600">Orders</div>
@@ -703,7 +703,7 @@ export const MarketplaceManagement: React.FC = () => {
                       <div className="text-sm text-gray-500">{order.buyerEmail}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      ${order.totalAmount.toFixed(2)}
+                      ₦{order.totalAmount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOrderStatusColor(order.status)}`}>
@@ -844,7 +844,7 @@ export const MarketplaceManagement: React.FC = () => {
                   <p className="text-xs text-green-600">This month</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-green-600">${totalRevenue.toFixed(2)}</p>
+                  <p className="text-lg font-bold text-green-600">₦{totalRevenue.toFixed(2)}</p>
                   <p className="text-xs text-green-500">+15% from last month</p>
                 </div>
               </div>
@@ -865,7 +865,7 @@ export const MarketplaceManagement: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-purple-600">
-                    ${totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : '0.00'}
+                    ₦{totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : '0.00'}
                   </p>
                   <p className="text-xs text-purple-500">Stable</p>
                 </div>

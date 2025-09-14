@@ -196,6 +196,8 @@ export interface VendorService {
   status: 'active' | 'inactive' | 'pending' | 'rejected';
   connectedGroups: string[];
   imageUrl: string;
+  images?: string[];
+  videos?: string[];
   rating: number;
   reviewCount: number;
   createdAt: string;

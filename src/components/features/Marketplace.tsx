@@ -75,7 +75,7 @@ export const Marketplace: React.FC = () => {
                 <p className="text-xs text-gray-500 mt-1">Valid until {new Date(item.discountValidUntil).toLocaleDateString()}</p>
               )}
               <div className="mt-3 flex items-center justify-between">
-                <div className="text-gray-900 font-bold">{item.currency} {item.price.toFixed(2)}</div>
+                <div className="text-gray-900 font-bold">{item.currency === 'NGN' ? '₦' : item.currency} {item.price.toFixed(2)}</div>
                 <button onClick={()=>setSelected(item)} className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center">View <ChevronRight className="w-4 h-4 ml-1" /></button>
               </div>
             </div>
@@ -105,7 +105,7 @@ export const Marketplace: React.FC = () => {
                 {selected.discountPercent && (
                   <p className="text-sm text-red-700 mb-2">Discount: {selected.discountPercent}% (valid until {selected.discountValidUntil && new Date(selected.discountValidUntil).toLocaleDateString()})</p>
                 )}
-                <p className="text-xl font-bold text-gray-900 mb-3">{selected.currency} {selected.price.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900 mb-3">{selected.currency === 'NGN' ? '₦' : selected.currency} {selected.price.toFixed(2)}</p>
                 <div className="flex items-center space-x-3">
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-lg inline-flex items-center"><ShoppingCart className="w-4 h-4 mr-2" />Add to Cart</button>
                   {selected.category === 'service' && (

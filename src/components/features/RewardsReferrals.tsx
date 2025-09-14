@@ -171,7 +171,7 @@ export const RewardsReferrals: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Earnings</p>
-              <p className="text-2xl font-bold text-green-600">${totalEarnings.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-green-600">₦{totalEarnings.toFixed(2)}</p>
             </div>
             <Gift className="w-8 h-8 text-green-500" />
           </div>
@@ -301,7 +301,7 @@ export const RewardsReferrals: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-green-600">{completedReferrals}</p>
-                  <p className="text-xs text-green-500">${(completedReferrals * 25).toFixed(2)} earned</p>
+                  <p className="text-xs text-green-500">₦{(completedReferrals * 25).toFixed(2)} earned</p>
                 </div>
               </div>
 
@@ -312,7 +312,7 @@ export const RewardsReferrals: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-yellow-600">{pendingReferrals}</p>
-                  <p className="text-xs text-yellow-500">${(pendingReferrals * 25).toFixed(2)} potential</p>
+                  <p className="text-xs text-yellow-500">₦{(pendingReferrals * 25).toFixed(2)} potential</p>
                 </div>
               </div>
 
@@ -378,7 +378,7 @@ export const RewardsReferrals: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                        ${referral.reward.toFixed(2)}
+                        ₦{referral.reward.toFixed(2)}
                       </td>
                     </tr>
                   ))}
@@ -466,7 +466,7 @@ export const RewardsReferrals: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <p className={`text-lg font-bold ${entry.name === 'You' ? 'text-blue-600' : 'text-green-600'}`}>
-                      ${entry.earnings.toFixed(2)}
+                      ₦{entry.earnings.toFixed(2)}
                     </p>
                     <p className="text-xs text-gray-500">Total earned</p>
                   </div>

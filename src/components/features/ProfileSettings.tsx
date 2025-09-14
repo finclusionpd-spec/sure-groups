@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Shield, Bell, Globe, Eye, EyeOff, Smartphone, Key } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { User, Mail, Phone, MapPin, Shield, Bell, Globe, Eye, EyeOff, Smartphone, Key, CreditCard, Banknote, Trash2, Download, Lock } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ProfileData {
   fullName: string;
@@ -25,39 +26,58 @@ interface PrivacySettings {
 }
 
 export const ProfileSettings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'privacy' | 'notifications' | 'language'>('profile');
+  const { user } = useAuth();
+  const storageKey = (k: string) => `settings:${user?.id || 'anon'}:${k}`;
+  const read = <T,>(k: string, fb: T): T => {
+    try { const raw = localStorage.getItem(storageKey(k)); return raw ? (JSON.parse(raw) as T) : fb; } catch { return fb; }
+  };
+  const write = (k: string, v: any) => { try { localStorage.setItem(storageKey(k), JSON.stringify(v)); } catch {} };
+
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'privacy' | 'notifications' | 'language' | 'payments' | 'wallet-settings' | 'data'>('profile');
   
-  const [profile, setProfile] = useState<ProfileData>({
+  const [profile, setProfile] = useState<ProfileData>(read('profile', {
     fullName: 'John Doe',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
     address: 'Lagos, Nigeria',
     bio: 'Active community member passionate about youth ministry and community service.',
     avatar: 'JD'
-  });
+  }));
 
-  const [security, setSecurity] = useState<SecuritySettings>({
+  const [security, setSecurity] = useState<SecuritySettings>(read('security', {
     twoFactorEnabled: true,
     pinLoginEnabled: false,
     biometricEnabled: true,
     loginNotifications: true
-  });
+  }));
 
-  const [privacy, setPrivacy] = useState<PrivacySettings>({
+  const [privacy, setPrivacy] = useState<PrivacySettings>(read('privacy', {
     profileVisibility: 'members',
     showEmail: false,
     showPhone: false,
     allowDirectMessages: true
-  });
+  }));
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPasswords, setShowPasswords] = useState(false);
 
-  const [language, setLanguage] = useState('english');
-  const [timezone, setTimezone] = useState('America/New_York');
-  const [currency, setCurrency] = useState('USD');
+  const [language, setLanguage] = useState(read('language', 'english'));
+  const [timezone, setTimezone] = useState(read('timezone', 'America/New_York'));
+  const [currency, setCurrency] = useState(read('currency', 'NGN'));
+
+  const [paymentMethods, setPaymentMethods] = useState<{ id: string; type: 'card' | 'bank'; label: string; last4?: string }[]>(read('payments', []));
+  const [newCard, setNewCard] = useState({ number: '', name: '', expiry: '' });
+  const [newBank, setNewBank] = useState({ bank: '', account: '' });
+
+  useEffect(() => { write('profile', profile); }, [profile]);
+  useEffect(() => { write('security', security); }, [security]);
+  useEffect(() => { write('privacy', privacy); }, [privacy]);
+  useEffect(() => { write('language', language); }, [language]);
+  useEffect(() => { write('timezone', timezone); }, [timezone]);
+  useEffect(() => { write('currency', currency); }, [currency]);
+  useEffect(() => { write('payments', paymentMethods); }, [paymentMethods]);
 
   const languages = [
     { code: 'english', name: 'English' },
@@ -75,7 +95,7 @@ export const ProfileSettings: React.FC = () => {
     'Australia/Sydney'
   ];
 
-  const currencies = ['USD', 'EUR', 'GBP', 'NGN', 'CAD'];
+  const currencies = ['NGN', 'USD', 'EUR', 'GBP', 'CAD'];
 
   const handleProfileUpdate = () => {
     alert('Profile updated successfully!');
@@ -176,6 +196,46 @@ export const ProfileSettings: React.FC = () => {
               }`}
             >
               Language & Region
+            </button>
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'payments'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Payment Methods
+            </button>
+            <button
+              onClick={() => setActiveTab('wallet-settings')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'wallet-settings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Wallet Settings
+            </button>
+            <button
+              onClick={() => setActiveTab('notifications')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'notifications'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Notifications
+            </button>
+            <button
+              onClick={() => setActiveTab('data')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'data'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Privacy & Data
             </button>
           </nav>
         </div>
@@ -545,6 +605,117 @@ export const ProfileSettings: React.FC = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Payment Methods */}
+      {activeTab === 'payments' && (
+        <div className="max-w-2xl space-y-6">
+          <div className="bg-white rounded-lg border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Saved Methods</h2>
+            <div className="space-y-2">
+              {paymentMethods.map(pm => (
+                <div key={pm.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div className="flex items-center space-x-3">
+                    {pm.type === 'card' ? <CreditCard className="w-5 h-5 text-blue-600" /> : <Banknote className="w-5 h-5 text-green-600" />}
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{pm.label}</div>
+                      {pm.last4 && <div className="text-xs text-gray-500">•••• {pm.last4}</div>}
+                    </div>
+                  </div>
+                  <button onClick={() => setPaymentMethods(paymentMethods.filter(x => x.id !== pm.id))} className="text-red-600 text-sm inline-flex items-center"><Trash2 className="w-4 h-4 mr-1" /> Remove</button>
+                </div>
+              ))}
+              {paymentMethods.length === 0 && <div className="text-sm text-gray-500">No payment methods saved.</div>}
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Add Card</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input className="px-3 py-2 border rounded" placeholder="Card Number" value={newCard.number} onChange={e => setNewCard({ ...newCard, number: e.target.value })} />
+              <input className="px-3 py-2 border rounded" placeholder="Name on Card" value={newCard.name} onChange={e => setNewCard({ ...newCard, name: e.target.value })} />
+              <input className="px-3 py-2 border rounded" placeholder="MM/YY" value={newCard.expiry} onChange={e => setNewCard({ ...newCard, expiry: e.target.value })} />
+            </div>
+            <div className="mt-3 text-right">
+              <button onClick={() => {
+                if (!newCard.number || newCard.number.length < 12) return alert('Enter valid card');
+                const last4 = newCard.number.slice(-4);
+                setPaymentMethods([{ id: `pm-${Date.now()}`, type: 'card', label: `${newCard.name} • ${newCard.expiry}`, last4 }, ...paymentMethods]);
+                setNewCard({ number: '', name: '', expiry: '' });
+              }} className="px-4 py-2 bg-blue-600 text-white rounded">Save Card</button>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Link Bank</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input className="px-3 py-2 border rounded" placeholder="Bank Name" value={newBank.bank} onChange={e => setNewBank({ ...newBank, bank: e.target.value })} />
+              <input className="px-3 py-2 border rounded" placeholder="Account Number" value={newBank.account} onChange={e => setNewBank({ ...newBank, account: e.target.value })} />
+            </div>
+            <div className="mt-3 text-right">
+              <button onClick={() => {
+                if (!newBank.bank || !newBank.account) return alert('Enter bank and account');
+                setPaymentMethods([{ id: `pm-${Date.now()}`, type: 'bank', label: `${newBank.bank} • ${newBank.account}` }, ...paymentMethods]);
+                setNewBank({ bank: '', account: '' });
+              }} className="px-4 py-2 bg-blue-600 text-white rounded">Link Bank</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wallet Settings */}
+      {activeTab === 'wallet-settings' && (
+        <div className="max-w-2xl space-y-6">
+          <div className="bg-white rounded-lg border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Wallet Preferences</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Default Currency</label>
+                <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full px-3 py-2 border rounded">
+                  {currencies.map(c => (<option key={c} value={c}>{c}</option>))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Auto-accept Payouts</label>
+                <select className="w-full px-3 py-2 border rounded">
+                  <option>Enabled</option>
+                  <option>Disabled</option>
+                </select>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">These preferences are used across SureBanker and SureEscrow experiences.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications Settings */}
+      {activeTab === 'notifications' && (
+        <div className="max-w-2xl space-y-4 bg-white rounded-lg border p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Notifications</h2>
+          {[{ id: 'orders', label: 'Order Updates' }, { id: 'payments', label: 'Payments & Payouts' }, { id: 'reviews', label: 'New Reviews' }].map(n => (
+            <div key={n.id} className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">{n.label}</div>
+              <button onClick={() => write(`notif:${n.id}`, !(read(`notif:${n.id}`, true)))} className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-blue-600">
+                <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Privacy & Data */}
+      {activeTab === 'data' && (
+        <div className="max-w-2xl space-y-6">
+          <div className="bg-white rounded-lg border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Data Management</h2>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded mb-2">
+              <div className="text-sm text-gray-700 inline-flex items-center"><Download className="w-4 h-4 mr-2" /> Export My Data</div>
+              <button onClick={() => alert('Export requested')} className="px-3 py-2 bg-gray-900 text-white rounded text-sm">Export</button>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div className="text-sm text-red-700 inline-flex items-center"><Lock className="w-4 h-4 mr-2" /> Delete My Account</div>
+              <button onClick={() => confirm('Are you sure?') && alert('Deletion requested')} className="px-3 py-2 bg-red-600 text-white rounded text-sm">Request Deletion</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -139,14 +139,14 @@ export const EndpointExplorer: React.FC = () => {
       category: 'Transactions',
       parameters: [
         { name: 'amount', type: 'number', required: true, description: 'Transaction amount' },
-        { name: 'currency', type: 'string', required: true, description: 'Currency code (USD, NGN)' },
+        { name: 'currency', type: 'string', required: true, description: 'Currency code (NGN, USD)' },
         { name: 'description', type: 'string', required: true, description: 'Transaction description' },
         { name: 'recipient_id', type: 'string', required: true, description: 'Recipient user ID' }
       ],
       responseExample: `{
   "id": "txn_123",
   "amount": 100.00,
-  "currency": "USD",
+  "currency": "NGN",
   "status": "pending",
   "createdAt": "2025-01-14T10:30:00Z"
 }`
@@ -164,7 +164,7 @@ export const EndpointExplorer: React.FC = () => {
       responseExample: `{
   "id": "txn_123",
   "amount": 100.00,
-  "currency": "USD",
+  "currency": "NGN",
   "status": "completed",
   "description": "Payment for service",
   "createdAt": "2025-01-14T10:30:00Z",

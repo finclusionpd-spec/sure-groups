@@ -148,7 +148,7 @@ export const VendorSupport: React.FC = () => {
   };
 
   const handleRefundRequest = (orderId: string, amount: number) => {
-    alert(`Refund request submitted for order ${orderId} - $${amount.toFixed(2)}`);
+    alert(`Refund request submitted for order ${orderId} - ₦${amount.toFixed(2)}`);
   };
 
   const getStatusColor = (status: string) => {
@@ -375,7 +375,7 @@ export const VendorSupport: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-700">Amount</p>
-                        <p className="text-gray-600">${dispute.amount.toFixed(2)}</p>
+                        <p className="text-gray-600">₦{dispute.amount.toFixed(2)}</p>
                       </div>
                     </div>
                     
@@ -551,7 +551,7 @@ export const VendorSupport: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Amount</h4>
-                    <p className="text-gray-600">${selectedDispute.amount.toFixed(2)}</p>
+                    <p className="text-gray-600">₦{selectedDispute.amount.toFixed(2)}</p>
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Status</h4>

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '../common/Header';
 import { Sidebar } from '../common/Sidebar';
 import { MetricCard } from '../common/MetricCard';
 import { FeatureRouter } from '../common/FeatureRouter';
 import { getVendorNavigation } from '../../config/navigation';
 import { DashboardMetric } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { getWalletBalance } from '../../services/wallet';
 import { 
   Plus,
   ShoppingCart,
@@ -25,6 +27,18 @@ import {
 export const VendorDashboard: React.FC = () => {
   const navigation = getVendorNavigation();
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [walletSummary, setWalletSummary] = useState<{ balance: number; currency: string } | null>(null);
+  const [isNavigating, setIsNavigating] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      if (user?.id) {
+        const w = getWalletBalance(user.id);
+        setWalletSummary({ balance: w.balance, currency: w.currency });
+      }
+    } catch {}
+  }, [user?.id]);
   
   const metrics: DashboardMetric[] = [
     { title: 'Active Services', value: '8', change: '+2', trend: 'up' },
@@ -41,21 +55,57 @@ export const VendorDashboard: React.FC = () => {
       label: 'Add Service', 
       icon: Plus, 
       color: 'bg-blue-500',
-      action: () => setActiveFeature('services')
+      action: async () => {
+        setIsNavigating('add-service');
+        setActiveFeature('services');
+        setIsNavigating(null);
+      }
     },
     { 
       id: 'manage-orders', 
       label: 'Manage Orders', 
       icon: ShoppingCart, 
       color: 'bg-green-500',
-      action: () => setActiveFeature('orders')
+      action: async () => {
+        setIsNavigating('manage-orders');
+        setActiveFeature('orders');
+        setIsNavigating(null);
+      }
+    },
+    { 
+      id: 'wallet', 
+      label: 'Wallet', 
+      icon: DollarSign, 
+      color: 'bg-indigo-500',
+      action: async () => {
+        setIsNavigating('wallet');
+        setActiveFeature('wallet');
+        setIsNavigating(null);
+      }
+    },
+    { 
+      id: 'view-marketplace', 
+      label: 'View Marketplace', 
+      icon: ShoppingCart, 
+      color: 'bg-cyan-500',
+      action: async () => {
+        setIsNavigating('view-marketplace');
+        setActiveFeature('vendor-marketplace');
+        setIsNavigating(null);
+      }
     },
     { 
       id: 'view-transactions', 
       label: 'View Transactions', 
       icon: DollarSign, 
       color: 'bg-purple-500',
-      action: () => setActiveFeature('transactions')
+      action: async () => {
+        setIsNavigating('view-transactions');
+        // set a prefilter flag in localStorage to instruct transactions page to default filters
+        try { localStorage.setItem('vendor-transactions-prefilter', JSON.stringify({ status: 'completed', type: 'payment' })); } catch {}
+        setActiveFeature('transactions');
+        setIsNavigating(null);
+      }
     },
     { 
       id: 'marketing-tools', 
@@ -172,6 +222,10 @@ export const VendorDashboard: React.FC = () => {
   ];
 
   const handleFeatureSelect = (featureId: string) => {
+    if (featureId === 'dashboard') {
+      setActiveFeature(null);
+      return;
+    }
     setActiveFeature(featureId);
   };
 
@@ -240,7 +294,7 @@ export const VendorDashboard: React.FC = () => {
                     <Bell className="w-5 h-5 text-blue-600" />
                     <div>
                       <p className="text-sm font-medium text-blue-900">You have 3 new orders and 2 pending reviews</p>
-                      <p className="text-xs text-blue-700">Last payment: $125.00 received 2 hours ago</p>
+                      <p className="text-xs text-blue-700">Wallet balance: {walletSummary ? `${walletSummary.currency === 'NGN' ? '₦' : walletSummary.currency} ${walletSummary.balance.toFixed(2)}` : 'loading...'}</p>
                     </div>
                   </div>
                   <button

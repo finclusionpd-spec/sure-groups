@@ -104,6 +104,14 @@ export const VendorTourGuide: React.FC = () => {
     setShowTour(true);
     setCurrentStep(0);
   };
+  const restartTour = () => {
+    setSteps(tourSteps);
+    setCurrentStep(0);
+    setShowTour(true);
+  };
+  const dismissTour = () => {
+    setShowTour(false);
+  };
 
   const completedSteps = steps.filter(step => step.completed).length;
   const progressPercentage = (completedSteps / steps.length) * 100;
@@ -160,7 +168,7 @@ export const VendorTourGuide: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 flex items-center justify-center space-x-3">
           <button
             onClick={startTour}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2 mx-auto"
@@ -168,6 +176,10 @@ export const VendorTourGuide: React.FC = () => {
             <Play className="w-4 h-4" />
             <span>{completedSteps === 0 ? 'Start Vendor Tour' : 'Continue Tour'}</span>
           </button>
+          {completedSteps > 0 && (
+            <button onClick={restartTour} className="px-4 py-2 border rounded hover:bg-gray-50">Restart</button>
+          )}
+          <button onClick={dismissTour} className="px-4 py-2 border rounded hover:bg-gray-50">Dismiss</button>
         </div>
       </div>
 

@@ -426,7 +426,7 @@ export const VendorMarketing: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-700">Cost</p>
-                    <p className="text-gray-600">${listing.cost.toFixed(2)}</p>
+                    <p className="text-gray-600">₦{listing.cost.toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-700">Start Date</p>

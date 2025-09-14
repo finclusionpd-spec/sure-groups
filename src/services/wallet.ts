@@ -46,11 +46,19 @@ function seedCampaigns(): Campaign[] {
 function getOrCreateWallet(userId: string): WalletState {
   const key = WALLET_KEY(userId);
   const existing = readJSON<WalletState | null>(key, null);
-  if (existing) return existing;
+  if (existing) {
+    // migrate currency to NGN if previously set to another currency
+    if (existing.currency !== 'NGN') {
+      const migrated = { ...existing, currency: 'NGN' };
+      writeJSON(key, migrated);
+      return migrated;
+    }
+    return existing;
+  }
   const created: WalletState = {
     walletId: `wal-${userId}`,
     balance: 500.0,
-    currency: 'USD',
+    currency: 'NGN',
   };
   writeJSON(key, created);
   return created;
@@ -128,7 +136,14 @@ export function recordDonation(donation: DonationRecord & { userId: string }): v
 }
 
 export function getDonationHistory(userId: string): DonationRecord[] {
-  return readJSON<DonationRecord[]>(DONATIONS_KEY(userId), []);
+  const key = DONATIONS_KEY(userId);
+  const list = readJSON<DonationRecord[]>(key, []);
+  // migrate currencies to NGN
+  const migrated = list.map(r => (r.currency !== 'NGN' ? { ...r, currency: 'NGN' } : r));
+  if (migrated.length !== list.length || migrated.some((r, i) => r.currency !== list[i].currency)) {
+    writeJSON(key, migrated);
+  }
+  return migrated;
 }
 
 export function buildReceiptText(dr: DonationRecord): string {
