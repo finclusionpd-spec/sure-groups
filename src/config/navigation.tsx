@@ -215,8 +215,7 @@ export const getVendorNavigation = (): NavigationGroup[] => [
     title: 'Dashboard & Overview',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: Home },
-      { id: 'vendor-tour', label: 'User Tour Guide', icon: HelpCircle },
-      { id: 'vendor-profile', label: 'Vendor Profile', icon: Users }
+      { id: 'vendor-tour', label: 'User Tour Guide', icon: HelpCircle }
     ]
   },
   {
@@ -245,7 +244,6 @@ export const getVendorNavigation = (): NavigationGroup[] => [
     title: 'Reputation & Trust',
     items: [
       { id: 'ratings-reviews', label: 'Ratings & Reviews', icon: Star },
-      { id: 'trust-verification', label: 'Reputation & Trust', icon: Shield }
     ]
   },
   {

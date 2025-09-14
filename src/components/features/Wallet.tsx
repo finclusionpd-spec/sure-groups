@@ -22,7 +22,7 @@ interface Contact {
 }
 
 export const Wallet: React.FC = () => {
-  const [balance] = useState(1247.85);
+  const [balance] = useState(124785.00);
   const [activeTab, setActiveTab] = useState<'overview' | 'send' | 'receive' | 'history'>('overview');
   const [showQRCode, setShowQRCode] = useState(false);
   
@@ -182,7 +182,7 @@ export const Wallet: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-blue-100 text-sm">Available Balance</p>
-            <p className="text-3xl font-bold">${balance.toFixed(2)}</p>
+            <p className="text-3xl font-bold">₦{balance.toFixed(2)}</p>
             <p className="text-blue-100 text-sm mt-1">Sure Banker Account</p>
           </div>
           <div className="text-right">
@@ -198,7 +198,7 @@ export const Wallet: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Sent</p>
-              <p className="text-xl font-bold text-red-600">${totalSent.toFixed(2)}</p>
+              <p className="text-xl font-bold text-red-600">₦{totalSent.toFixed(2)}</p>
             </div>
             <ArrowUpRight className="w-6 h-6 text-red-500" />
           </div>
@@ -207,7 +207,7 @@ export const Wallet: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Received</p>
-              <p className="text-xl font-bold text-green-600">${totalReceived.toFixed(2)}</p>
+              <p className="text-xl font-bold text-green-600">₦{totalReceived.toFixed(2)}</p>
             </div>
             <ArrowDownLeft className="w-6 h-6 text-green-500" />
           </div>
@@ -334,7 +334,7 @@ export const Wallet: React.FC = () => {
                   <div className="text-right">
                     <p className={`text-sm font-medium ${getTransactionColor(transaction.type)}`}>
                       {transaction.type === 'sent' || transaction.type === 'withdrawal' ? '-' : '+'}
-                      ${transaction.amount.toFixed(2)}
+                      ₦{transaction.amount.toFixed(2)}
                     </p>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
                       {transaction.status}

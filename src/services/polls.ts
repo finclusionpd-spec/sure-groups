@@ -1,6 +1,8 @@
 import { PollData } from '../types';
+import { addNotification } from './notifications';
 
 const POLLS_KEY = 'sure-polls';
+const USER_VOTES_KEY = (userId: string) => `sure-poll-votes-${userId}`;
 
 function read(): PollData[] {
   try {
@@ -22,6 +24,10 @@ export function listPolls(groupId?: string): PollData[] {
     all = seedPolls(groupId);
   }
   return groupId ? all.filter(p => p.groupId === groupId) : all;
+}
+
+export function getPollById(pollId: string): PollData | undefined {
+  return read().find(p => p.id === pollId);
 }
 
 export function createPoll(poll: Omit<PollData, 'id' | 'totalVotes'> & { id?: string; totalVotes?: number }): PollData {
@@ -90,5 +96,81 @@ function seedPolls(groupId?: string): PollData[] {
 
   write(polls);
   return polls;
+}
+
+function readUserVotes(userId: string): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(USER_VOTES_KEY(userId));
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeUserVotes(userId: string, map: Record<string, string>) {
+  localStorage.setItem(USER_VOTES_KEY(userId), JSON.stringify(map));
+}
+
+export function hasVoted(userId: string, pollId: string): boolean {
+  const m = readUserVotes(userId);
+  return !!m[pollId];
+}
+
+export function submitVote(userId: string, pollId: string, optionId: string): PollData | undefined {
+  const polls = read();
+  const idx = polls.findIndex(p => p.id === pollId);
+  if (idx === -1) return undefined;
+  const poll = polls[idx];
+  const now = Date.now();
+  if (poll.status !== 'active') return poll;
+  if (new Date(poll.endDate).getTime() < now) return poll;
+  const votesMap = readUserVotes(userId);
+  if (votesMap[pollId]) return poll;
+
+  const options = poll.options.map(o => o.id === optionId ? { ...o, votes: (o.votes || 0) + 1 } : o);
+  const totalVotes = (poll.totalVotes || 0) + 1;
+  const updated: PollData = { ...poll, options, totalVotes };
+  polls[idx] = updated;
+  write(polls);
+  votesMap[pollId] = optionId;
+  writeUserVotes(userId, votesMap);
+  return updated;
+}
+
+export function listActivePolls(): PollData[] {
+  const now = Date.now();
+  return read().filter(p => p.status === 'active' && new Date(p.endDate).getTime() >= now);
+}
+
+export function listPastPolls(): PollData[] {
+  const now = Date.now();
+  return read().filter(p => p.status === 'completed' || new Date(p.endDate).getTime() < now);
+}
+
+// Optional: helper to create notifications for members when new polls available or closing soon
+export function notifyPollsIfNeeded(userId: string) {
+  try {
+    const seenKey = `sure-polls-seen-${userId}`;
+    const seen = new Set<string>(JSON.parse(localStorage.getItem(seenKey) || '[]'));
+    const now = Date.now();
+    const soon = now + 24 * 3600 * 1000;
+    const all = read();
+    const toMark: string[] = [];
+    all.forEach(p => {
+      if (p.status === 'active' && !seen.has(`active:${p.id}`)) {
+        addNotification({ title: 'New Poll Available', message: p.title, type: 'group', priority: 'medium', actionUrl: '/dashboard' });
+        toMark.push(`active:${p.id}`);
+      }
+      const end = new Date(p.endDate).getTime();
+      if (p.status === 'active' && end < soon && !seen.has(`closing:${p.id}`)) {
+        addNotification({ title: 'Poll Closing Soon', message: p.title, type: 'group', priority: 'low', actionUrl: '/dashboard' });
+        toMark.push(`closing:${p.id}`);
+      }
+    });
+    if (toMark.length > 0) {
+      const next = Array.from(new Set([...Array.from(seen), ...toMark]));
+      localStorage.setItem(seenKey, JSON.stringify(next));
+    }
+  } catch {}
 }
 

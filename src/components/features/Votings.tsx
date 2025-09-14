@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Plus, Vote, Clock, CheckCircle, X, Eye, BarChart3, Users, Calendar, Edit as EditIcon, Trash2 as TrashIcon } from 'lucide-react';
 import { PollData, UserRole } from '../../types';
-import { createPoll, updatePoll, deletePoll, listPolls } from '../../services/polls';
+import { createPoll, updatePoll, deletePoll, listPolls, submitVote, hasVoted, listActivePolls, listPastPolls, notifyPollsIfNeeded } from '../../services/polls';
 import { useAuth } from '../../contexts/AuthContext';
 
 type Voting = PollData & { eligibleVoters?: number };
@@ -9,7 +9,9 @@ type Voting = PollData & { eligibleVoters?: number };
 export const Votings: React.FC = () => {
   const { user } = useAuth();
   const isGroupAdmin = user?.role === 'group-admin';
+  const isMember = user?.role === 'member';
   const [votings, setVotings] = useState<Voting[]>(() => listPolls());
+  const [memberTab, setMemberTab] = useState<'active' | 'past'>('active');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editPoll, setEditPoll] = useState<Voting | null>(null);
   useEffect(() => {
@@ -17,6 +19,9 @@ export const Votings: React.FC = () => {
     window.addEventListener('sure-polls-updated', onUpdate as any);
     return () => window.removeEventListener('sure-polls-updated', onUpdate as any);
   }, []);
+  useEffect(() => {
+    if (user?.id && isMember) notifyPollsIfNeeded(user.id);
+  }, [user?.id, isMember]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | Voting['status']>('all');
@@ -106,8 +111,8 @@ export const Votings: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Voting Management</h1>
-        <p className="text-gray-600">Create, manage, and monitor polls for your group</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{isMember ? 'Group Polls' : 'Voting Management'}</h1>
+        <p className="text-gray-600">{isMember ? 'Vote on polls created by your Group Admins' : 'Create, manage, and monitor polls for your group'}</p>
       </div>
 
       {/* Stats Cards */}
@@ -190,19 +195,32 @@ export const Votings: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-600">Showing {filteredVotings.length} poll(s)</div>
-        {isGroupAdmin && (
-          <button onClick={() => setShowCreateModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
-            <Plus className="w-4 h-4" />
-            <span>Create New Poll</span>
-          </button>
-        )}
-      </div>
+      {!isMember && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm text-gray-600">Showing {filteredVotings.length} poll(s)</div>
+          {isGroupAdmin && (
+            <button onClick={() => setShowCreateModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+              <Plus className="w-4 h-4" />
+              <span>Create New Poll</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {isMember && (
+        <div className="mb-4">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button onClick={() => setMemberTab('active')} className={`py-2 px-1 border-b-2 font-medium text-sm ${memberTab === 'active' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Active Polls</button>
+              <button onClick={() => setMemberTab('past')} className={`py-2 px-1 border-b-2 font-medium text-sm ${memberTab === 'past' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Past Polls</button>
+            </nav>
+          </div>
+        </div>
+      )}
 
       {/* Polls List */}
       <div className="space-y-6">
-        {filteredVotings.map((voting) => (
+        {(isMember ? (memberTab === 'active' ? listActivePolls() : listPastPolls()) : filteredVotings).map((voting) => (
           <div key={voting.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
@@ -273,14 +291,11 @@ export const Votings: React.FC = () => {
               </div>
               
               <div className="flex items-center space-x-4 ml-4">
-                <button
-                  onClick={() => setSelectedVoting(voting)}
-                  className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
-                >
+                <button onClick={() => setSelectedVoting(voting)} className="text-blue-600 hover:text-blue-900 flex items-center space-x-1">
                   <Eye className="w-4 h-4" />
-                  <span>View Details</span>
+                  <span>{isMember ? 'View / Vote' : 'View Details'}</span>
                 </button>
-                {isGroupAdmin && (
+                {isGroupAdmin && !isMember && (
                   <>
                     <button onClick={() => setEditPoll(voting)} className="text-gray-700 hover:text-gray-900 flex items-center space-x-1">
                       <EditIcon className="w-4 h-4" />
@@ -306,7 +321,7 @@ export const Votings: React.FC = () => {
         )}
       </div>
 
-      {/* Voting Details Modal / Results */}
+      {/* Voting Details Modal / Vote + Results */}
       {selectedVoting && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -356,6 +371,25 @@ export const Votings: React.FC = () => {
                 </div>
               </div>
 
+              {/* Vote Now (member-only, active, not voted) */}
+              {isMember && selectedVoting.status === 'active' && user?.id && !hasVoted(user.id, selectedVoting.id) && (
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-blue-900 mb-2">Vote Now</h4>
+                  <VotingInterface
+                    voting={selectedVoting}
+                    onVote={(optionIds) => {
+                      const choice = optionIds[0];
+                      if (!choice || !user?.id) return;
+                      const updated = submitVote(user.id, selectedVoting.id, choice);
+                      if (updated) {
+                        setVotings(prev => prev.map(p => p.id === updated.id ? updated : p));
+                        setSelectedVoting(updated as any);
+                      }
+                    }}
+                  />
+                </div>
+              )}
+
               {/* Results Chart-like bars */}
               <div className="space-y-3">
                 {selectedVoting.options.map(opt => {
@@ -377,7 +411,7 @@ export const Votings: React.FC = () => {
                 })}
               </div>
 
-              {isGroupAdmin && selectedVoting.status === 'active' && (
+              {isGroupAdmin && !isMember && selectedVoting.status === 'active' && (
                 <div className="pt-4">
                   <button onClick={() => { handleClosePoll(selectedVoting.id); setSelectedVoting(null); }} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Close Poll</button>
                 </div>

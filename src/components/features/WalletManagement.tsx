@@ -19,16 +19,23 @@ interface WalletTxRow {
 const txKey = (userId: string) => `sure-wallet-tx-${userId}`;
 const payoutKey = (userId: string) => `sure-payout-accounts-${userId}`;
 
-export const WalletManagement: React.FC = () => {
+interface WalletManagementProps {
+  actorId?: string;
+  allowAllRoles?: boolean;
+  heading?: string;
+}
+
+export const WalletManagement: React.FC<WalletManagementProps> = ({ actorId, allowAllRoles = false, heading }) => {
   const { user } = useAuth();
   const isGroupAdmin = user?.role === 'group-admin';
   const adminId = user?.id || 'group-admin';
+  const ownerId = actorId || adminId;
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [wallet, setWallet] = useState(() => getWalletBalance(adminId));
-  const [escrow, setEscrow] = useState(() => getWalletBalance(`${adminId}-escrow`));
+  const [wallet, setWallet] = useState(() => getWalletBalance(ownerId));
+  const [escrow, setEscrow] = useState(() => getWalletBalance(`${ownerId}-escrow`));
   const [txs, setTxs] = useState<WalletTxRow[]>([]);
   const [typeFilter, setTypeFilter] = useState<'all' | TxType>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | TxStatus>('all');
@@ -49,9 +56,9 @@ export const WalletManagement: React.FC = () => {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(txKey(adminId));
+      const raw = localStorage.getItem(txKey(ownerId));
       let loaded: WalletTxRow[] = raw ? (JSON.parse(raw) as WalletTxRow[]) : [];
-      const accRaw = localStorage.getItem(payoutKey(adminId));
+      const accRaw = localStorage.getItem(payoutKey(ownerId));
       setPayoutAccounts(accRaw ? (JSON.parse(accRaw) as any[]) : []);
 
       // Seed dummy transactions if none exist
@@ -105,16 +112,16 @@ export const WalletManagement: React.FC = () => {
           },
         ];
         loaded = seed;
-        localStorage.setItem(txKey(adminId), JSON.stringify(seed));
+        localStorage.setItem(txKey(ownerId), JSON.stringify(seed));
       }
       setTxs(loaded);
     } catch {}
     setLoading(false);
-  }, [adminId]);
+  }, [ownerId]);
 
   const saveTxs = (rows: WalletTxRow[]) => {
     setTxs(rows);
-    localStorage.setItem(txKey(adminId), JSON.stringify(rows));
+    localStorage.setItem(txKey(ownerId), JSON.stringify(rows));
   };
 
   const addTx = (row: Omit<WalletTxRow, 'id' | 'createdAt' | 'status'> & { status?: TxStatus }) => {
@@ -149,7 +156,7 @@ export const WalletManagement: React.FC = () => {
     );
   }, [txs, typeFilter, statusFilter, dateFilter]);
 
-  if (!isGroupAdmin) {
+  if (!allowAllRoles && !isGroupAdmin) {
     return (
       <div className="p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Wallet Management</h1>
@@ -167,7 +174,7 @@ export const WalletManagement: React.FC = () => {
     if (isNaN(amount) || amount <= 0) return setError('Enter a valid amount');
     if (!requirePin()) return setError('Invalid PIN (hint: 1234)');
     try {
-      const { newBalance } = debitWallet(adminId, amount, `Send: ${sendForm.purpose || 'Transfer'}`);
+      const { newBalance } = debitWallet(ownerId, amount, `Send: ${sendForm.purpose || 'Transfer'}`);
       setWallet(prev => ({ ...prev, balance: newBalance }));
       addTx({ walletId: wallet.walletId, type: 'debit', amount, description: `Sent to ${sendForm.recipient}: ${sendForm.purpose || 'Transfer'}` });
       setShowSend(false);
@@ -183,7 +190,7 @@ export const WalletManagement: React.FC = () => {
     const amount = parseFloat(fundForm.amount);
     if (isNaN(amount) || amount <= 0) return setError('Enter a valid amount');
     try {
-      const { newBalance } = creditWallet(adminId, amount, `Top-up via ${fundForm.method}`);
+      const { newBalance } = creditWallet(ownerId, amount, `Top-up via ${fundForm.method}`);
       setWallet(prev => ({ ...prev, balance: newBalance }));
       addTx({ walletId: wallet.walletId, type: 'credit', amount, description: `Funded via ${fundForm.method}` });
       setShowFund(false);
@@ -200,7 +207,7 @@ export const WalletManagement: React.FC = () => {
     if (isNaN(amount) || amount <= 0) return setError('Enter a valid amount');
     if (!requirePin()) return setError('Invalid PIN (hint: 1234)');
     try {
-      const { newBalance } = debitWallet(adminId, amount, `Withdraw to ${withdrawForm.bankId}`);
+      const { newBalance } = debitWallet(ownerId, amount, `Withdraw to ${withdrawForm.bankId}`);
       setWallet(prev => ({ ...prev, balance: newBalance }));
       addTx({ walletId: wallet.walletId, type: 'debit', amount, description: `Withdrawal to ${withdrawForm.bankId}` });
       setShowWithdraw(false);
@@ -216,14 +223,14 @@ export const WalletManagement: React.FC = () => {
     const account = { id: `acct-${Date.now()}`, ...newAccount };
     const next = [account, ...payoutAccounts];
     setPayoutAccounts(next);
-    localStorage.setItem(payoutKey(adminId), JSON.stringify(next));
+    localStorage.setItem(payoutKey(ownerId), JSON.stringify(next));
     setNewAccount({ bankName: '', accountNumber: '' });
   };
 
   const removePayoutAccount = (id: string) => {
     const next = payoutAccounts.filter(a => a.id !== id);
     setPayoutAccounts(next);
-    localStorage.setItem(payoutKey(adminId), JSON.stringify(next));
+    localStorage.setItem(payoutKey(ownerId), JSON.stringify(next));
   };
 
   const paymentLink = `${window.location.origin}/pay?to=${encodeURIComponent(wallet.walletId)}&ref=${Date.now()}`;
@@ -231,7 +238,7 @@ export const WalletManagement: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Wallet Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{heading || 'Wallet Management'}</h1>
         <p className="text-gray-600">Manage your SureBanker wallets and transactions</p>
       </div>
 

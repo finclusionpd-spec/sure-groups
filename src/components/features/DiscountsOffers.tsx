@@ -237,8 +237,8 @@ export const DiscountsOffers: React.FC = () => {
                 </div>
                 {offer.originalPrice && offer.discountedPrice && (
                   <div className="text-right">
-                    <p className="text-sm text-gray-500 line-through">${offer.originalPrice.toFixed(2)}</p>
-                    <p className="text-lg font-bold text-green-600">${offer.discountedPrice.toFixed(2)}</p>
+                    <p className="text-sm text-gray-500 line-through">₦{offer.originalPrice.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-green-600">₦{offer.discountedPrice.toFixed(2)}</p>
                   </div>
                 )}
               </div>
@@ -341,13 +341,13 @@ export const DiscountsOffers: React.FC = () => {
                   <h4 className="text-sm font-medium text-green-900 mb-2">Pricing</h4>
                   <div className="flex items-center space-x-4">
                     <span className="text-lg text-gray-500 line-through">
-                      ${selectedOffer.originalPrice.toFixed(2)}
+                      ₦{selectedOffer.originalPrice.toFixed(2)}
                     </span>
                     <span className="text-2xl font-bold text-green-600">
-                      ${selectedOffer.discountedPrice.toFixed(2)}
+                      ₦{selectedOffer.discountedPrice.toFixed(2)}
                     </span>
                     <span className="text-sm text-green-600">
-                      Save ${(selectedOffer.originalPrice - selectedOffer.discountedPrice).toFixed(2)}
+                      Save ₦{(selectedOffer.originalPrice - selectedOffer.discountedPrice).toFixed(2)}
                     </span>
                   </div>
                 </div>

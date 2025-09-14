@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, DollarSign, Clock, Shield, Eye, Download, TrendingUp, CreditCard } from 'lucide-react';
 import { VendorTransaction } from '../../types';
 
@@ -54,6 +54,18 @@ export const VendorTransactions: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | VendorTransaction['status']>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | VendorTransaction['type']>('all');
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('vendor-transactions-prefilter');
+      if (raw) {
+        const pref = JSON.parse(raw);
+        if (pref.status) setStatusFilter(pref.status);
+        if (pref.type) setTypeFilter(pref.type);
+        localStorage.removeItem('vendor-transactions-prefilter');
+      }
+    } catch {}
+  }, []);
   const [selectedTransaction, setSelectedTransaction] = useState<VendorTransaction | null>(null);
 
   const filteredTransactions = transactions.filter(transaction => {
@@ -134,7 +146,7 @@ export const VendorTransactions: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Earnings</p>
-              <p className="text-2xl font-bold text-green-600">${totalEarnings.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-green-600">₦{totalEarnings.toFixed(2)}</p>
             </div>
             <DollarSign className="w-8 h-8 text-green-500" />
           </div>
@@ -143,7 +155,7 @@ export const VendorTransactions: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">In Escrow</p>
-              <p className="text-2xl font-bold text-blue-600">${escrowAmount.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-blue-600">₦{escrowAmount.toFixed(2)}</p>
             </div>
             <Shield className="w-8 h-8 text-blue-500" />
           </div>
@@ -152,7 +164,7 @@ export const VendorTransactions: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">${pendingAmount.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-yellow-600">₦{pendingAmount.toFixed(2)}</p>
             </div>
             <Clock className="w-8 h-8 text-yellow-500" />
           </div>
@@ -257,7 +269,7 @@ export const VendorTransactions: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">${transaction.amount.toFixed(2)}</div>
+                    <div className="text-sm font-medium text-gray-900">₦{transaction.amount.toFixed(2)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
@@ -331,7 +343,7 @@ export const VendorTransactions: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Amount</h4>
-                  <p className="text-gray-600">${selectedTransaction.amount.toFixed(2)}</p>
+                  <p className="text-gray-600">₦{selectedTransaction.amount.toFixed(2)}</p>
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Type</h4>

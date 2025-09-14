@@ -209,7 +209,7 @@ export const TransactionManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Volume</p>
-              <p className="text-2xl font-bold text-gray-900">${totalAmount.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">₦{totalAmount.toFixed(2)}</p>
             </div>
             <DollarSign className="w-8 h-8 text-gray-500" />
           </div>
@@ -336,7 +336,7 @@ export const TransactionManagement: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      ${transaction.amount.toFixed(2)} {transaction.currency}
+                      ₦{transaction.amount.toFixed(2)} {transaction.currency}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -419,7 +419,7 @@ export const TransactionManagement: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Amount</h4>
-                  <p className="text-gray-600">${selectedTransaction.amount.toFixed(2)} {selectedTransaction.currency}</p>
+                  <p className="text-gray-600">₦{selectedTransaction.amount.toFixed(2)} {selectedTransaction.currency}</p>
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Payment Method</h4>

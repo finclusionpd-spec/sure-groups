@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CreditCard, Clock, History, Receipt, Download } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { DonationRecord, DonationType } from '../../types';
@@ -35,7 +35,69 @@ export const Donations: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastDonation, setLastDonation] = useState<DonationRecord | null>(null);
 
+  const [historyRefresh, setHistoryRefresh] = useState(0);
   const history = getDonationHistory(userId);
+
+  useEffect(() => {
+    // Prefill donate form with dummy data for Member POV
+    if (user?.role === 'member') {
+      try {
+        if (!amount) setAmount('25');
+        if (!note) setNote('Community support');
+        if (campaigns.length > 0 && !campaignId) setCampaignId(campaigns[0].id);
+        setDonationType('campaign');
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.role]);
+
+  useEffect(() => {
+    // Seed dummy history for Member POV if empty
+    if (user?.role === 'member' && history.length === 0) {
+      const currency = wallet.currency;
+      const pick = (arr: Campaign[]) => (arr.length > 0 ? arr[Math.floor(Math.random() * arr.length)] : undefined);
+      const c1 = pick(campaigns);
+      const now = Date.now();
+      const samples: DonationRecord[] = [
+        {
+          id: `DON-SEED-${now - 1}`,
+          donorUserId: userId,
+          donorUserName: userName,
+          amount: 25.0,
+          currency,
+          donationType: 'general',
+          transactionId: `TX-${now - 1}`,
+          createdAt: new Date(now - 1000 * 60 * 60 * 24 * 10).toISOString(),
+        },
+        {
+          id: `DON-SEED-${now - 2}`,
+          donorUserId: userId,
+          donorUserName: userName,
+          amount: 50.0,
+          currency,
+          donationType: 'campaign',
+          campaignId: c1?.id,
+          campaignName: c1?.name,
+          transactionId: `TX-${now - 2}`,
+          createdAt: new Date(now - 1000 * 60 * 60 * 24 * 7).toISOString(),
+        },
+        {
+          id: `DON-SEED-${now - 3}`,
+          donorUserId: userId,
+          donorUserName: userName,
+          amount: 10.5,
+          currency,
+          donationType: 'custom',
+          note: 'Support youth program',
+          transactionId: `TX-${now - 3}`,
+          createdAt: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(),
+        },
+      ];
+      samples.forEach(s => recordDonation({ ...s, userId } as any));
+      setHistoryRefresh(x => x + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, user?.role]);
 
   const selectedCampaign: Campaign | undefined = campaigns.find(c => c.id === campaignId);
 

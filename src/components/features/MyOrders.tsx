@@ -244,7 +244,7 @@ export const MyOrders: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Spent</p>
-              <p className="text-2xl font-bold text-purple-600">${totalSpent.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-purple-600">₦{totalSpent.toFixed(2)}</p>
             </div>
             <Package className="w-8 h-8 text-purple-500" />
           </div>
@@ -301,7 +301,7 @@ export const MyOrders: React.FC = () => {
                     <p className="text-xs text-gray-500">{order.groupName}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900">${order.totalAmount.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-gray-900">₦{order.totalAmount.toFixed(2)}</p>
                     <p className="text-sm text-gray-500">Qty: {order.quantity}</p>
                   </div>
                 </div>
@@ -457,7 +457,7 @@ export const MyOrders: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Total Amount</h4>
-                  <p className="text-gray-600">${selectedOrder.totalAmount.toFixed(2)}</p>
+                  <p className="text-gray-600">₦{selectedOrder.totalAmount.toFixed(2)}</p>
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Order Date</h4>

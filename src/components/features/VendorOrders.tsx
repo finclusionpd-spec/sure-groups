@@ -287,7 +287,7 @@ export const VendorOrders: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-700">Amount</p>
-                    <p className="text-lg font-bold text-green-600">${order.amount.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-green-600">₦{order.amount.toFixed(2)}</p>
                   </div>
                 </div>
 
@@ -418,7 +418,7 @@ export const VendorOrders: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Amount:</span>
-                      <span className="text-gray-900">${selectedOrder.amount.toFixed(2)}</span>
+                      <span className="text-gray-900">₦{selectedOrder.amount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Order Date:</span>

@@ -39,7 +39,6 @@ import { VendorOrders } from '../features/VendorOrders';
 import { VendorTransactions } from '../features/VendorTransactions';
 import { VendorMarketing } from '../features/VendorMarketing';
 import { VendorSupport } from '../features/VendorSupport';
-import { VendorReputationTrust } from '../features/VendorReputationTrust';
 import { DeveloperTourGuide } from '../features/DeveloperTourGuide';
 import { APIKeyManagement } from '../features/APIKeyManagement';
 import { APIDocumentation } from '../features/APIDocumentation';
@@ -69,12 +68,15 @@ import { Votings } from '../features/Votings';
 import { Donations } from '../features/Donations';
 import { DonationManagement } from '../features/DonationManagement';
 import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
+import { VendorWallet } from '../features/VendorWallet';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
   featureId: string;
 }
 
 export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
+  const { user } = useAuth();
   switch (featureId) {
     case 'user-tour':
       return <UserTourGuide />;
@@ -99,6 +101,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'reports-flags':
       return <ReportsFlags />;
     case 'wallet':
+      if (user?.role === 'vendor') return <VendorWallet />;
+      if (user?.role === 'member') return <WalletManagement actorId={user.id} allowAllRoles heading="My Wallet" />;
       return <Wallet />;
     case 'donations':
       return <Donations />;
@@ -156,17 +160,6 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <DeveloperRatings />;
     case 'vendor-tour':
       return <VendorTourGuide />;
-    case 'vendor-profile':
-      return (
-        <div className="p-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Vendor Profile</h2>
-            <p className="text-gray-600">
-              Manage your vendor profile and business information.
-            </p>
-          </div>
-        </div>
-      );
     case 'services':
       return <VendorServices />;
     case 'vendor-orders':
@@ -180,7 +173,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'support':
       return <VendorSupport />;
     case 'trust-verification':
-      return <VendorReputationTrust />;
+      return <RatingsReviews />;
     case 'referrals-rewards':
       return <RewardsReferrals />;
     case 'notifications':

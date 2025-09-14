@@ -57,7 +57,7 @@ export const SystemSettings: React.FC = () => {
     enableTwoFactor: true,
     enableSMS: true,
     defaultTimezone: 'UTC',
-    defaultCurrency: 'USD',
+    defaultCurrency: 'NGN',
     defaultLanguage: 'English'
   });
 

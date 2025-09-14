@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Star, ThumbsUp, ThumbsDown, MessageSquare, Filter, Send } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Star, ThumbsUp, ThumbsDown, MessageSquare, Filter, Send, Shield, Award, TrendingUp, CheckCircle } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -32,7 +32,7 @@ interface RatingTarget {
 }
 
 export const RatingsReviews: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'my-reviews' | 'rate-new' | 'received'>('my-reviews');
+  const [activeTab, setActiveTab] = useState<'reviews' | 'trust'>('reviews');
   
   const [myReviews, setMyReviews] = useState<Review[]>([
     {
@@ -127,6 +127,11 @@ export const RatingsReviews: React.FC = () => {
   const [selectedTarget, setSelectedTarget] = useState<RatingTarget | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
 
+  // Filters
+  const [reviewerQuery, setReviewerQuery] = useState('');
+  const [minStars, setMinStars] = useState<number | 'all'>('all');
+  const [dateOrder, setDateOrder] = useState<'newest' | 'oldest'>('newest');
+
   const handleSubmitReview = () => {
     if (!selectedTarget || !newReview.title || !newReview.comment) {
       alert('Please fill in all required fields');
@@ -201,6 +206,21 @@ export const RatingsReviews: React.FC = () => {
   const averageRating = myReviews.length > 0 ? 
     myReviews.reduce((sum, review) => sum + review.rating, 0) / myReviews.length : 0;
 
+  const filteredReviews = useMemo(() => {
+    let list = [...myReviews];
+    if (minStars !== 'all') list = list.filter(r => r.rating >= (minStars as number));
+    if (reviewerQuery.trim()) list = list.filter(r =>
+      r.title.toLowerCase().includes(reviewerQuery.toLowerCase()) ||
+      r.comment.toLowerCase().includes(reviewerQuery.toLowerCase()) ||
+      r.targetName.toLowerCase().includes(reviewerQuery.toLowerCase())
+    );
+    list.sort((a, b) => dateOrder === 'newest'
+      ? (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      : (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    );
+    return list;
+  }, [myReviews, minStars, reviewerQuery, dateOrder]);
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -257,138 +277,257 @@ export const RatingsReviews: React.FC = () => {
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             <button
-              onClick={() => setActiveTab('my-reviews')}
+              onClick={() => setActiveTab('reviews')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'my-reviews'
+                activeTab === 'reviews'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              My Reviews ({myReviews.length})
+              Ratings & Reviews ({myReviews.length})
             </button>
             <button
-              onClick={() => setActiveTab('rate-new')}
+              onClick={() => setActiveTab('trust')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'rate-new'
+                activeTab === 'trust'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Rate & Review
+              Reputation & Trust
             </button>
           </nav>
         </div>
       </div>
 
-      {/* My Reviews Tab */}
-      {activeTab === 'my-reviews' && (
-        <div className="space-y-6">
-          {myReviews.map((review) => (
-            <div key={review.id} className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{review.title}</h3>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(review.targetType)}`}>
-                      {review.targetType}
-                    </span>
-                    {review.isAnonymous && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Anonymous</span>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2 mb-2">
-                    {renderStars(review.rating)}
-                    <span className="text-sm text-gray-600">for {review.targetName}</span>
-                  </div>
-                  <p className="text-gray-700 mb-3">{review.comment}</p>
-                  <p className="text-xs text-gray-500">
-                    Posted on {new Date(review.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
+      {/* Ratings & Reviews Tab */}
+      {activeTab === 'reviews' && (
+        <>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <input
+                  type="text"
+                  value={reviewerQuery}
+                  onChange={(e) => setReviewerQuery(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Filter by title, comment, or target"
+                />
               </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => handleHelpfulVote(review.id, true)}
-                    className="flex items-center space-x-1 text-green-600 hover:text-green-800"
-                  >
-                    <ThumbsUp className="w-4 h-4" />
-                    <span className="text-sm">{review.helpful}</span>
-                  </button>
-                  <button
-                    onClick={() => handleHelpfulVote(review.id, false)}
-                    className="flex items-center space-x-1 text-red-600 hover:text-red-800"
-                  >
-                    <ThumbsDown className="w-4 h-4" />
-                    <span className="text-sm">{review.notHelpful}</span>
-                  </button>
-                </div>
-                <span className="text-xs text-gray-500">
-                  {review.helpful + review.notHelpful} people found this helpful
-                </span>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Stars</label>
+                <select
+                  value={minStars}
+                  onChange={(e) => setMinStars(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="all">All</option>
+                  <option value={5}>5 stars</option>
+                  <option value={4}>4+ stars</option>
+                  <option value={3}>3+ stars</option>
+                  <option value={2}>2+ stars</option>
+                  <option value={1}>1+ star</option>
+                </select>
               </div>
-
-              {review.responses && review.responses.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Responses</h4>
-                  {review.responses.map((response) => (
-                    <div key={response.id} className="bg-gray-50 rounded-lg p-3 mb-2">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-gray-900">{response.responder}</span>
-                        <span className="text-xs text-gray-500">
-                          {new Date(response.timestamp).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-700">{response.message}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sort by Date</label>
+                <select
+                  value={dateOrder}
+                  onChange={(e) => setDateOrder(e.target.value as any)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                </select>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+          <div className="space-y-6">
+            {filteredReviews.map((review) => (
+              <div key={review.id} className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{review.title}</h3>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(review.targetType)}`}>
+                        {review.targetType}
+                      </span>
+                      {review.isAnonymous && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Anonymous</span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      {renderStars(review.rating)}
+                      <span className="text-sm text-gray-600">for {review.targetName}</span>
+                    </div>
+                    <p className="text-gray-700 mb-3">{review.comment}</p>
+                    <p className="text-xs text-gray-500">
+                      Posted on {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
 
-      {/* Rate New Tab */}
-      {activeTab === 'rate-new' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ratingTargets.map((target) => (
-            <div key={target.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{target.name}</h3>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(target.type)}`}>
-                    {target.type}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => handleHelpfulVote(review.id, true)}
+                      className="flex items-center space-x-1 text-green-600 hover:text-green-800"
+                    >
+                      <ThumbsUp className="w-4 h-4" />
+                      <span className="text-sm">{review.helpful}</span>
+                    </button>
+                    <button
+                      onClick={() => handleHelpfulVote(review.id, false)}
+                      className="flex items-center space-x-1 text-red-600 hover:text-red-800"
+                    >
+                      <ThumbsDown className="w-4 h-4" />
+                      <span className="text-sm">{review.notHelpful}</span>
+                    </button>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {review.helpful + review.notHelpful} people found this helpful
                   </span>
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-2 mb-3">
-                {renderStars(target.averageRating)}
-                <span className="text-sm text-gray-600">
-                  {target.averageRating.toFixed(1)} ({target.totalReviews} reviews)
-                </span>
+                {review.responses && review.responses.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Responses</h4>
+                    {review.responses.map((response) => (
+                      <div key={response.id} className="bg-gray-50 rounded-lg p-3 mb-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-900">{response.responder}</span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(response.timestamp).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-700">{response.message}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-
-              <button
-                onClick={() => {
-                  if (target.canRate) {
-                    setSelectedTarget(target);
-                    setShowReviewModal(true);
-                  }
-                }}
-                disabled={!target.canRate}
-                className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-                  target.canRate
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {target.canRate ? 'Write Review' : 'Already Reviewed'}
-              </button>
+            ))}
+          </div>
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Rate New</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ratingTargets.map((target) => (
+                <div key={target.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{target.name}</h3>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(target.type)}`}>
+                        {target.type}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    {renderStars(target.averageRating)}
+                    <span className="text-sm text-gray-600">
+                      {target.averageRating.toFixed(1)} ({target.totalReviews} reviews)
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (target.canRate) {
+                        setSelectedTarget(target);
+                        setShowReviewModal(true);
+                      }
+                    }}
+                    disabled={!target.canRate}
+                    className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+                      target.canRate
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {target.canRate ? 'Write Review' : 'Already Reviewed'}
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+        </>
+      )}
+
+      {/* Reputation & Trust Tab */}
+      {activeTab === 'trust' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Trust Score</p>
+                  <p className="text-2xl font-bold text-blue-600">92</p>
+                </div>
+                <Shield className="w-8 h-8 text-blue-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Verified Badges</p>
+                  <p className="text-2xl font-bold text-green-600">3</p>
+                </div>
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Customer Satisfaction</p>
+                  <p className="text-2xl font-bold text-emerald-600">96%</p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-emerald-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Response Rate</p>
+                  <p className="text-2xl font-bold text-purple-600">88%</p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-purple-500" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Verification Badges</h3>
+            <div className="flex flex-wrap gap-3">
+              <span className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                <CheckCircle className="w-4 h-4" />
+                <span>Identity Verified</span>
+              </span>
+              <span className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                <CheckCircle className="w-4 h-4" />
+                <span>Business Verified</span>
+              </span>
+              <span className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                <Award className="w-4 h-4" />
+                <span>Top Rated</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Reputation History</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                <span className="text-sm text-gray-700">2025-01-14</span>
+                <span className="text-sm text-gray-900">Received 5-star review for Health Screening Service</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                <span className="text-sm text-gray-700">2025-01-10</span>
+                <span className="text-sm text-gray-900">Verified Professional badge earned</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                <span className="text-sm text-gray-700">2025-01-05</span>
+                <span className="text-sm text-gray-900">Customer Satisfaction improved to 96%</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

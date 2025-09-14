@@ -38,7 +38,7 @@ function seedCatalog(): MarketplaceItem[] {
       name: 'Organic Honey - 500ml',
       description: 'Pure, locally sourced organic honey in a glass jar.',
       price: 25.99,
-      currency: 'USD',
+      currency: 'NGN',
       category: 'overall',
       images: [
         'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=640',
@@ -52,7 +52,7 @@ function seedCatalog(): MarketplaceItem[] {
       name: 'Handmade Crafts Set',
       description: 'Beautiful artisan crafts set made by community members.',
       price: 45.0,
-      currency: 'USD',
+      currency: 'NGN',
       category: 'overall',
       images: [
         'https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=640',
@@ -64,7 +64,7 @@ function seedCatalog(): MarketplaceItem[] {
       name: 'Health Screening Package',
       description: 'Comprehensive health screening including blood tests and consultation.',
       price: 125.0,
-      currency: 'USD',
+      currency: 'NGN',
       category: 'service',
       images: [
         'https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=640',
@@ -76,7 +76,7 @@ function seedCatalog(): MarketplaceItem[] {
       name: 'Digital Marketing Course',
       description: 'Hands-on course to master digital marketing fundamentals and tools.',
       price: 149.0,
-      currency: 'USD',
+      currency: 'NGN',
       category: 'service',
       images: [
         'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=640',
@@ -88,7 +88,7 @@ function seedCatalog(): MarketplaceItem[] {
       name: 'Community Savings Loan',
       description: 'Low-interest micro loan exclusively for group members.',
       price: 0,
-      currency: 'USD',
+      currency: 'NGN',
       category: 'service',
       images: [
         'https://images.pexels.com/photos/4386373/pexels-photo-4386373.jpeg?auto=compress&cs=tinysrgb&w=640',
@@ -100,7 +100,7 @@ function seedCatalog(): MarketplaceItem[] {
       name: 'Member Discount Coupon - 20% Off',
       description: 'Limited-time coupon for selected marketplace items.',
       price: 0,
-      currency: 'USD',
+      currency: 'NGN',
       category: 'discount',
       images: [
         'https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg?auto=compress&cs=tinysrgb&w=640',
