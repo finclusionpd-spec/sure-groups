@@ -27,6 +27,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const isDemoEnv = import.meta.env.VITE_DEMO_MODE === 'true';
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -49,6 +50,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
     } else if (storedDemo) {
       const demoUser = JSON.parse(storedDemo);
+      setAuthState({
+        user: demoUser,
+        isAuthenticated: true,
+        isLoading: false,
+        isDemoMode: true,
+      });
+    } else if (isDemoEnv) {
+      const demoUser: User = {
+        id: 'demo-group-admin',
+        fullName: 'Demo Group Admin',
+        email: 'demo-group-admin@suregroups.com',
+        role: 'group-admin',
+        isEmailVerified: true,
+        createdAt: new Date().toISOString(),
+      };
+      localStorage.setItem('sure-groups-demo', JSON.stringify(demoUser));
       setAuthState({
         user: demoUser,
         isAuthenticated: true,

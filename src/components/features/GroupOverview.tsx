@@ -30,7 +30,7 @@ interface GroupInfo {
 }
 
 export const GroupOverview: React.FC = () => {
-  const [groupInfo] = useState<GroupInfo>({
+  const [groupInfo, setGroupInfo] = useState<GroupInfo>({
     id: '1',
     name: 'Community Church',
     description: 'A welcoming community focused on faith, fellowship, and service to others.',
@@ -99,6 +99,15 @@ export const GroupOverview: React.FC = () => {
   ]);
 
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: groupInfo.name,
+    description: groupInfo.description,
+    category: groupInfo.category,
+    location: groupInfo.location,
+    website: groupInfo.website || '',
+    contactEmail: groupInfo.contactEmail,
+    profileImage: groupInfo.profileImage || ''
+  });
 
   return (
     <div className="p-6">
@@ -302,6 +311,115 @@ export const GroupOverview: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* Edit Group Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-xl max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit Group</h3>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Group Name</label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <input
+                    type="text"
+                    value={editForm.category}
+                    onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={editForm.location}
+                    onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                  <input
+                    type="url"
+                    value={editForm.website}
+                    onChange={(e) => setEditForm({ ...editForm, website: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
+                  <input
+                    type="email"
+                    value={editForm.contactEmail}
+                    onChange={(e) => setEditForm({ ...editForm, contactEmail: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image URL</label>
+                  <input
+                    type="url"
+                    value={editForm.profileImage}
+                    onChange={(e) => setEditForm({ ...editForm, profileImage: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                {editForm.profileImage && (
+                  <div className="col-span-2">
+                    <div className="text-sm text-gray-700 mb-1">Preview</div>
+                    <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                      <img src={editForm.profileImage} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setGroupInfo({
+                    ...groupInfo,
+                    name: editForm.name,
+                    description: editForm.description,
+                    category: editForm.category,
+                    location: editForm.location,
+                    website: editForm.website || undefined,
+                    contactEmail: editForm.contactEmail,
+                    profileImage: editForm.profileImage || undefined,
+                  });
+                  setShowEditModal(false);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

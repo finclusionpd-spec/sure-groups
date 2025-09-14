@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Users, Calendar, Settings, Eye, Edit, Trash2 } from 'lucide-react';
+import { Search, Users, Calendar, Settings, Eye, Edit, Trash2 } from 'lucide-react';
 import { GroupData } from '../../types';
 
 export const GroupManagement: React.FC = () => {
@@ -12,7 +12,8 @@ export const GroupManagement: React.FC = () => {
       memberCount: 245,
       status: 'active',
       createdBy: 'Pastor John',
-      createdAt: '2025-01-01T00:00:00Z'
+      createdAt: '2025-01-01T00:00:00Z',
+      profileImage: 'https://images.pexels.com/photos/208359/pexels-photo-208359.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop'
     },
     {
       id: '2',
@@ -22,7 +23,8 @@ export const GroupManagement: React.FC = () => {
       memberCount: 67,
       status: 'active',
       createdBy: 'Youth Pastor Sarah',
-      createdAt: '2025-01-05T00:00:00Z'
+      createdAt: '2025-01-05T00:00:00Z',
+      profileImage: 'https://images.pexels.com/photos/270789/pexels-photo-270789.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop'
     },
     {
       id: '3',
@@ -32,7 +34,8 @@ export const GroupManagement: React.FC = () => {
       memberCount: 156,
       status: 'active',
       createdBy: 'Union Rep Mike',
-      createdAt: '2025-01-10T00:00:00Z'
+      createdAt: '2025-01-10T00:00:00Z',
+      profileImage: 'https://images.pexels.com/photos/3182822/pexels-photo-3182822.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop'
     }
   ]);
 
@@ -186,36 +189,37 @@ export const GroupManagement: React.FC = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Group</span>
-          </button>
         </div>
       </div>
 
       {/* Groups Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredGroups.map((group) => (
-          <div key={group.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{group.name}</h3>
-                <p className="text-sm text-gray-600 mb-3">{group.description}</p>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(group.type)}`}>
-                    {group.type}
-                  </span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(group.status)}`}>
-                    {group.status}
-                  </span>
+          <div key={group.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative">
+              <img
+                src={group.profileImage || 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=640'}
+                alt={`${group.name} profile`}
+                className="w-full h-48 object-cover"
+              />
+            </div>
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{group.name}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{group.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(group.type)}`}>
+                      {group.type}
+                    </span>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(group.status)}`}>
+                      {group.status}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+            <div className="flex items-center justify-between text-sm text-gray-500 mb-4 px-6">
               <div className="flex items-center space-x-1">
                 <Users className="w-4 h-4" />
                 <span>{group.memberCount} members</span>
@@ -226,11 +230,9 @@ export const GroupManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="text-xs text-gray-400 mb-4">
-              Created by {group.createdBy}
-            </div>
+            <div className="text-xs text-gray-400 mb-4 px-6">Created by {group.createdBy}</div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-6 pb-6">
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setSelectedGroup(group)}
@@ -261,6 +263,7 @@ export const GroupManagement: React.FC = () => {
               >
                 {group.status === 'active' ? 'Deactivate' : 'Activate'}
               </button>
+            </div>
             </div>
           </div>
         ))}

@@ -13,10 +13,10 @@ import {
   TrendingUp,
   Settings,
   ArrowRight,
-  Plus,
   Send,
   UserPlus,
-  Flag
+  Flag,
+  DollarSign
 } from 'lucide-react';
 
 export const GroupAdminDashboard: React.FC = () => {
@@ -36,7 +36,7 @@ export const GroupAdminDashboard: React.FC = () => {
     { 
       id: 'create-group', 
       label: 'Create Group', 
-      icon: Plus, 
+      icon: Settings, 
       color: 'bg-blue-500',
       action: () => setActiveFeature('group-setup')
     },
@@ -67,6 +67,13 @@ export const GroupAdminDashboard: React.FC = () => {
       icon: UserPlus, 
       color: 'bg-emerald-500',
       action: () => setActiveFeature('membership-management')
+    },
+    { 
+      id: 'view-wallet', 
+      label: 'View Wallet', 
+      icon: DollarSign, 
+      color: 'bg-yellow-500',
+      action: () => setActiveFeature('wallet-management')
     },
     { 
       id: 'review-content', 
@@ -131,6 +138,10 @@ export const GroupAdminDashboard: React.FC = () => {
   ];
 
   const handleFeatureSelect = (featureId: string) => {
+    if (featureId === 'dashboard') {
+      setActiveFeature(null);
+      return;
+    }
     setActiveFeature(featureId);
   };
 

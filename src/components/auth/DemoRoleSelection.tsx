@@ -10,12 +10,16 @@ export const DemoRoleSelection: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const roleParam = searchParams.get('role') as UserRole;
+  const didAuto = React.useRef(false);
 
-  // If role is specified in URL, start demo immediately
+  // If role is specified in URL, start demo once and navigate
   React.useEffect(() => {
-    if (roleParam && ['super-admin', 'product-admin', 'group-admin', 'member'].includes(roleParam)) {
+    const allowed: UserRole[] = ['super-admin','product-admin','group-admin','member','vendor','developer'];
+    if (!didAuto.current && roleParam && allowed.includes(roleParam)) {
+      didAuto.current = true;
       startDemo(roleParam);
-      navigate('/dashboard');
+      // Use replace to avoid history loops
+      navigate('/dashboard', { replace: true });
     }
   }, [roleParam, startDemo, navigate]);
 

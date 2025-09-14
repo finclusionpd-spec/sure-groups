@@ -15,6 +15,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true 
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
   if (isLoading) {
     return (
@@ -24,7 +25,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (requireAuth && !isAuthenticated) {
+  if (!isDemoMode && requireAuth && !isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

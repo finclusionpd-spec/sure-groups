@@ -94,6 +94,14 @@ export interface EventData {
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   createdBy: string;
   createdAt: string;
+  bannerUrl?: string;
+  rsvpMode?: 'open' | 'invite-only' | 'limited';
+  attendees?: {
+    userId: string;
+    userName: string;
+    status: 'going' | 'interested' | 'declined';
+    timestamp: string;
+  }[];
 }
 
 // Feature Management Types
@@ -307,4 +315,27 @@ export interface DeveloperProfile {
     liveliness: boolean;
   };
   createdAt: string;
+}
+
+// Polls / Voting
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: number;
+}
+
+export interface PollData {
+  id: string;
+  title: string;
+  description: string;
+  options: PollOption[];
+  groupId: string;
+  groupName: string;
+  createdBy: string;
+  startDate: string;
+  endDate: string;
+  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  totalVotes: number;
+  visibility: 'public' | 'restricted';
+  allowedRoles?: UserRole[];
 }

@@ -1,130 +1,36 @@
-import React, { useState } from 'react';
-import { Search, Plus, Vote, Clock, CheckCircle, X, Eye, BarChart3, Users, Calendar } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Search, Plus, Vote, Clock, CheckCircle, X, Eye, BarChart3, Users, Calendar, Edit as EditIcon, Trash2 as TrashIcon } from 'lucide-react';
+import { PollData, UserRole } from '../../types';
+import { createPoll, updatePoll, deletePoll, listPolls } from '../../services/polls';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface VotingOption {
-  id: string;
-  text: string;
-  votes: number;
-  percentage: number;
-}
-
-interface Voting {
-  id: string;
-  title: string;
-  description: string;
-  type: 'single-choice' | 'multiple-choice' | 'yes-no';
-  options: VotingOption[];
-  groupName: string;
-  createdBy: string;
-  startDate: string;
-  endDate: string;
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
-  totalVotes: number;
-  hasVoted: boolean;
-  userVote?: string[];
-  isAnonymous: boolean;
-  requiresQuorum: boolean;
-  quorumPercentage?: number;
-  eligibleVoters: number;
-}
+type Voting = PollData & { eligibleVoters?: number };
 
 export const Votings: React.FC = () => {
-  const [votings, setVotings] = useState<Voting[]>([
-    {
-      id: '1',
-      title: 'Youth Camp Location Selection',
-      description: 'Help us choose the location for our annual youth summer camp. Your vote will help determine where we spend this amazing week together.',
-      type: 'single-choice',
-      options: [
-        { id: '1', text: 'Mountain Resort - Obudu Ranch', votes: 23, percentage: 45 },
-        { id: '2', text: 'Beach Resort - Tarkwa Bay', votes: 18, percentage: 35 },
-        { id: '3', text: 'City Conference Center - Lagos', votes: 10, percentage: 20 }
-      ],
-      groupName: 'Youth Ministry',
-      createdBy: 'Youth Pastor Sarah',
-      startDate: '2025-01-15T00:00:00Z',
-      endDate: '2025-01-25T23:59:59Z',
-      status: 'active',
-      totalVotes: 51,
-      hasVoted: false,
-      isAnonymous: true,
-      requiresQuorum: true,
-      quorumPercentage: 60,
-      eligibleVoters: 67
-    },
-    {
-      id: '2',
-      title: 'Sunday Service Time Change',
-      description: 'Should we change our Sunday service time to accommodate more families? This is an important decision that affects our entire community.',
-      type: 'yes-no',
-      options: [
-        { id: '1', text: 'Yes, change to 11:00 AM', votes: 89, percentage: 62 },
-        { id: '2', text: 'No, keep current time (10:00 AM)', votes: 54, percentage: 38 }
-      ],
-      groupName: 'Community Church',
-      createdBy: 'Pastor John',
-      startDate: '2025-01-10T00:00:00Z',
-      endDate: '2025-01-20T23:59:59Z',
-      status: 'active',
-      totalVotes: 143,
-      hasVoted: true,
-      userVote: ['1'],
-      isAnonymous: false,
-      requiresQuorum: true,
-      quorumPercentage: 50,
-      eligibleVoters: 245
-    },
-    {
-      id: '3',
-      title: 'Community Service Projects',
-      description: 'Which community service projects should we prioritize this quarter? You can select multiple options.',
-      type: 'multiple-choice',
-      options: [
-        { id: '1', text: 'Neighborhood Cleanup Drive', votes: 34, percentage: 28 },
-        { id: '2', text: 'Food Bank Volunteer Program', votes: 45, percentage: 37 },
-        { id: '3', text: 'Elderly Care Assistance', votes: 28, percentage: 23 },
-        { id: '4', text: 'Youth Mentorship Program', votes: 15, percentage: 12 }
-      ],
-      groupName: 'Community Care',
-      createdBy: 'Community Coordinator',
-      startDate: '2025-01-12T00:00:00Z',
-      endDate: '2025-01-22T23:59:59Z',
-      status: 'active',
-      totalVotes: 67,
-      hasVoted: false,
-      isAnonymous: true,
-      requiresQuorum: false,
-      eligibleVoters: 89
-    },
-    {
-      id: '4',
-      title: 'Annual Budget Approval',
-      description: 'Vote to approve the proposed annual budget for union activities and member benefits.',
-      type: 'yes-no',
-      options: [
-        { id: '1', text: 'Approve Budget', votes: 78, percentage: 85 },
-        { id: '2', text: 'Reject Budget', votes: 14, percentage: 15 }
-      ],
-      groupName: 'Local Union Chapter',
-      createdBy: 'Union Rep Mike',
-      startDate: '2025-01-08T00:00:00Z',
-      endDate: '2025-01-18T23:59:59Z',
-      status: 'completed',
-      totalVotes: 92,
-      hasVoted: true,
-      userVote: ['1'],
-      isAnonymous: false,
-      requiresQuorum: true,
-      quorumPercentage: 75,
-      eligibleVoters: 156
-    }
-  ]);
+  const { user } = useAuth();
+  const isGroupAdmin = user?.role === 'group-admin';
+  const [votings, setVotings] = useState<Voting[]>(() => listPolls());
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editPoll, setEditPoll] = useState<Voting | null>(null);
+  useEffect(() => {
+    const onUpdate = () => setVotings(listPolls());
+    window.addEventListener('sure-polls-updated', onUpdate as any);
+    return () => window.removeEventListener('sure-polls-updated', onUpdate as any);
+  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | Voting['status']>('all');
   const [groupFilter, setGroupFilter] = useState('all');
   const [selectedVoting, setSelectedVoting] = useState<Voting | null>(null);
-  const [userVotes, setUserVotes] = useState<Record<string, string[]>>({});
+  const [newPoll, setNewPoll] = useState({
+    title: '',
+    description: '',
+    options: [''],
+    startDate: '',
+    endDate: '',
+    visibility: 'public' as 'public' | 'restricted',
+    allowedRoles: ['member' as UserRole]
+  });
 
   const filteredVotings = votings.filter(voting => {
     const matchesSearch = voting.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -134,38 +40,41 @@ export const Votings: React.FC = () => {
     return matchesSearch && matchesStatus && matchesGroup;
   });
 
-  const handleVote = (votingId: string, optionIds: string[]) => {
-    const voting = votings.find(v => v.id === votingId);
-    if (!voting || voting.hasVoted) return;
+  const handleCreatePoll = () => {
+    const options = newPoll.options
+      .map(t => t.trim())
+      .filter(Boolean)
+      .map((t, idx) => ({ id: String(idx + 1), text: t, votes: 0 }));
+    const poll: Omit<PollData, 'id' | 'totalVotes'> = {
+      title: newPoll.title,
+      description: newPoll.description,
+      options,
+      groupId: '1',
+      groupName: 'Community Church',
+      createdBy: user?.fullName || 'Group Admin',
+      startDate: newPoll.startDate,
+      endDate: newPoll.endDate,
+      status: 'active',
+      totalVotes: 0 as any,
+      visibility: newPoll.visibility,
+      allowedRoles: newPoll.visibility === 'restricted' ? newPoll.allowedRoles : undefined,
+    } as any;
+    const created = createPoll(poll);
+    setVotings(prev => [created, ...prev]);
+    setShowCreateModal(false);
+    setNewPoll({ title: '', description: '', options: [''], startDate: '', endDate: '', visibility: 'public', allowedRoles: ['member'] });
+  };
 
-    // Update local state
-    setUserVotes(prev => ({ ...prev, [votingId]: optionIds }));
-    
-    // Update voting data
-    setVotings(votings.map(v => {
-      if (v.id === votingId) {
-        const updatedOptions = v.options.map(option => {
-          const newVotes = optionIds.includes(option.id) ? option.votes + 1 : option.votes;
-          const newTotal = v.totalVotes + (optionIds.includes(option.id) ? 1 : 0);
-          return {
-            ...option,
-            votes: newVotes,
-            percentage: Math.round((newVotes / (newTotal || 1)) * 100)
-          };
-        });
-        
-        return {
-          ...v,
-          options: updatedOptions,
-          totalVotes: v.totalVotes + 1,
-          hasVoted: true,
-          userVote: optionIds
-        };
-      }
-      return v;
-    }));
+  const handleDeletePoll = (id: string) => {
+    deletePoll(id);
+    setVotings(prev => prev.filter(p => p.id !== id));
+  };
 
-    alert('Your vote has been recorded successfully!');
+  const handleClosePoll = (id: string) => {
+    const updated = votings.map(p => p.id === id ? { ...p, status: 'completed' } : p);
+    setVotings(updated);
+    const changed = updated.find(p => p.id === id)!;
+    updatePoll(changed);
   };
 
   const getStatusColor = (status: string) => {
@@ -188,24 +97,17 @@ export const Votings: React.FC = () => {
     }
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'single-choice': return 'bg-blue-100 text-blue-700';
-      case 'multiple-choice': return 'bg-purple-100 text-purple-700';
-      case 'yes-no': return 'bg-green-100 text-green-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
-  };
+  // Polls no longer use a separate type field in admin view
 
   const activeVotings = votings.filter(v => v.status === 'active').length;
   const completedVotings = votings.filter(v => v.status === 'completed').length;
-  const participationRate = votings.filter(v => v.hasVoted).length / votings.length * 100;
+  const totalVotesAll = votings.reduce((sum, v) => sum + (v.totalVotes || 0), 0);
 
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Manage Votings</h1>
-        <p className="text-gray-600">Participate in group decisions and view voting results</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Voting Management</h1>
+        <p className="text-gray-600">Create, manage, and monitor polls for your group</p>
       </div>
 
       {/* Stats Cards */}
@@ -240,8 +142,8 @@ export const Votings: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Participation Rate</p>
-              <p className="text-2xl font-bold text-purple-600">{participationRate.toFixed(0)}%</p>
+              <p className="text-sm font-medium text-gray-600">Total Votes</p>
+              <p className="text-2xl font-bold text-purple-600">{totalVotesAll}</p>
             </div>
             <BarChart3 className="w-8 h-8 text-purple-500" />
           </div>
@@ -288,7 +190,17 @@ export const Votings: React.FC = () => {
         </div>
       </div>
 
-      {/* Votings List */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-gray-600">Showing {filteredVotings.length} poll(s)</div>
+        {isGroupAdmin && (
+          <button onClick={() => setShowCreateModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+            <Plus className="w-4 h-4" />
+            <span>Create New Poll</span>
+          </button>
+        )}
+      </div>
+
+      {/* Polls List */}
       <div className="space-y-6">
         {filteredVotings.map((voting) => (
           <div key={voting.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -300,9 +212,7 @@ export const Votings: React.FC = () => {
                     {getStatusIcon(voting.status)}
                     <span className="ml-1">{voting.status}</span>
                   </span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(voting.type)}`}>
-                    {voting.type.replace('-', ' ')}
-                  </span>
+                  {/* Removed type badge (not used in admin poll model) */}
                 </div>
                 
                 <p className="text-gray-600 mb-4">{voting.description}</p>
@@ -314,11 +224,11 @@ export const Votings: React.FC = () => {
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Users className="w-4 h-4 mr-2" />
-                    <span>{voting.totalVotes} / {voting.eligibleVoters} voted</span>
+                    <span>{voting.totalVotes} total votes</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <BarChart3 className="w-4 h-4 mr-2" />
-                    <span>{Math.round((voting.totalVotes / voting.eligibleVoters) * 100)}% participation</span>
+                    <span>{voting.status === 'active' ? 'Active' : 'Closed'}</span>
                   </div>
                 </div>
 
@@ -340,62 +250,29 @@ export const Votings: React.FC = () => {
                   )}
                 </div>
 
-                {voting.hasVoted && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-green-800">You have voted in this poll</span>
-                    </div>
-                  </div>
-                )}
-
-                {voting.requiresQuorum && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-600">Quorum Progress</span>
-                      <span className="text-sm text-gray-900">
-                        {Math.round((voting.totalVotes / voting.eligibleVoters) * 100)}% / {voting.quorumPercentage}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full ${
-                          (voting.totalVotes / voting.eligibleVoters) * 100 >= voting.quorumPercentage! 
-                            ? 'bg-green-500' 
-                            : 'bg-blue-500'
-                        }`}
-                        style={{ width: `${Math.min((voting.totalVotes / voting.eligibleVoters) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Voting Options */}
+                {/* Results Preview */}
                 <div className="space-y-3">
-                  {voting.options.map((option) => (
-                    <div key={option.id} className="border border-gray-200 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-900">{option.text}</span>
-                        <span className="text-sm text-gray-600">{option.votes} votes</span>
+                  {voting.options.map((option) => {
+                    const percentage = Math.round((option.votes / (voting.totalVotes || 1)) * 100);
+                    return (
+                      <div key={option.id} className="border border-gray-200 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-900">{option.text}</span>
+                          <span className="text-sm text-gray-600">{option.votes} votes</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${percentage}%` }}></div>
+                        </div>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-xs text-gray-500">{percentage}%</span>
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${option.percentage}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-xs text-gray-500">{option.percentage}%</span>
-                        {voting.userVote?.includes(option.id) && (
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Your vote</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2 ml-4">
+              <div className="flex items-center space-x-4 ml-4">
                 <button
                   onClick={() => setSelectedVoting(voting)}
                   className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
@@ -403,15 +280,17 @@ export const Votings: React.FC = () => {
                   <Eye className="w-4 h-4" />
                   <span>View Details</span>
                 </button>
-                
-                {voting.status === 'active' && !voting.hasVoted && (
-                  <button
-                    onClick={() => setSelectedVoting(voting)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-1"
-                  >
-                    <Vote className="w-4 h-4" />
-                    <span>Vote Now</span>
-                  </button>
+                {isGroupAdmin && (
+                  <>
+                    <button onClick={() => setEditPoll(voting)} className="text-gray-700 hover:text-gray-900 flex items-center space-x-1">
+                      <EditIcon className="w-4 h-4" />
+                      <span>Edit</span>
+                    </button>
+                    <button onClick={() => handleDeletePoll(voting.id)} className="text-red-600 hover:text-red-800 flex items-center space-x-1">
+                      <TrashIcon className="w-4 h-4" />
+                      <span>Delete</span>
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -421,13 +300,13 @@ export const Votings: React.FC = () => {
         {filteredVotings.length === 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
             <Vote className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Votings Found</h3>
-            <p className="text-gray-500">No votings match your current filters.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No polls created yet</h3>
+            <p className="text-gray-500">Click “Create New Poll” to start.</p>
           </div>
         )}
       </div>
 
-      {/* Voting Details Modal */}
+      {/* Voting Details Modal / Results */}
       {selectedVoting && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -447,9 +326,7 @@ export const Votings: React.FC = () => {
                   {getStatusIcon(selectedVoting.status)}
                   <span className="ml-1">{selectedVoting.status}</span>
                 </span>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(selectedVoting.type)}`}>
-                  {selectedVoting.type.replace('-', ' ')}
-                </span>
+                {/* Removed type badge in details */}
                 {selectedVoting.isAnonymous && (
                   <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">Anonymous</span>
                 )}
@@ -479,34 +356,157 @@ export const Votings: React.FC = () => {
                 </div>
               </div>
 
-              {selectedVoting.status === 'active' && !selectedVoting.hasVoted && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Cast Your Vote</h4>
-                  <VotingInterface 
-                    voting={selectedVoting} 
-                    onVote={(optionIds) => {
-                      handleVote(selectedVoting.id, optionIds);
-                      setSelectedVoting(null);
-                    }}
-                  />
-                </div>
-              )}
+              {/* Results Chart-like bars */}
+              <div className="space-y-3">
+                {selectedVoting.options.map(opt => {
+                  const pct = Math.round((opt.votes / (selectedVoting.totalVotes || 1)) * 100);
+                  return (
+                    <div key={opt.id} className="border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-900">{opt.text}</span>
+                        <span className="text-sm text-gray-600">{opt.votes} votes</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${pct}%` }}></div>
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-xs text-gray-500">{pct}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-              {selectedVoting.hasVoted && (
-                <div className="bg-green-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-green-900 mb-2">Your Vote</h4>
-                  <div className="space-y-1">
-                    {selectedVoting.userVote?.map(voteId => {
-                      const option = selectedVoting.options.find(opt => opt.id === voteId);
-                      return option ? (
-                        <div key={voteId} className="text-sm text-green-800">
-                          ✓ {option.text}
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
+              {isGroupAdmin && selectedVoting.status === 'active' && (
+                <div className="pt-4">
+                  <button onClick={() => { handleClosePoll(selectedVoting.id); setSelectedVoting(null); }} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Close Poll</button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Poll Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-xl max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Create New Poll</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input type="text" value={newPoll.title} onChange={(e) => setNewPoll({ ...newPoll, title: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea value={newPoll.description} onChange={(e) => setNewPoll({ ...newPoll, description: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows={3} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
+                <div className="space-y-2">
+                  {newPoll.options.map((opt, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <input type="text" value={opt} onChange={(e) => setNewPoll({ ...newPoll, options: newPoll.options.map((o, i) => i === idx ? e.target.value : o) })} className="flex-1 px-3 py-2 border rounded" placeholder={`Option ${idx + 1}`} />
+                      <button onClick={() => setNewPoll({ ...newPoll, options: newPoll.options.filter((_, i) => i !== idx) })} className="text-red-600 hover:text-red-800">Remove</button>
+                    </div>
+                  ))}
+                  <button onClick={() => setNewPoll({ ...newPoll, options: [...newPoll.options, ''] })} className="text-blue-600 hover:text-blue-800 text-sm">+ Add option</button>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <input type="date" value={newPoll.startDate} onChange={(e) => setNewPoll({ ...newPoll, startDate: e.target.value })} className="w-full px-3 py-2 border rounded" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <input type="date" value={newPoll.endDate} onChange={(e) => setNewPoll({ ...newPoll, endDate: e.target.value })} className="w-full px-3 py-2 border rounded" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                <select value={newPoll.visibility} onChange={(e) => setNewPoll({ ...newPoll, visibility: e.target.value as any })} className="w-full px-3 py-2 border rounded">
+                  <option value="public">Public (within group)</option>
+                  <option value="restricted">Restricted by role</option>
+                </select>
+                {newPoll.visibility === 'restricted' && (
+                  <div className="mt-2 text-sm text-gray-700">Allowed roles: Member</div>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={handleCreatePoll} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Poll</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Poll Modal */}
+      {editPoll && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-xl max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit Poll</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input type="text" value={editPoll.title} onChange={(e) => setEditPoll({ ...editPoll, title: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea value={editPoll.description} onChange={(e) => setEditPoll({ ...editPoll, description: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows={3} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
+                <div className="space-y-2">
+                  {editPoll.options.map((opt, idx) => (
+                    <div key={opt.id} className="flex items-center space-x-2">
+                      <input type="text" value={opt.text} onChange={(e) => setEditPoll({ ...editPoll, options: editPoll.options.map((o, i) => i === idx ? { ...o, text: e.target.value } : o) })} className="flex-1 px-3 py-2 border rounded" />
+                      <button onClick={() => setEditPoll({ ...editPoll, options: editPoll.options.filter((_, i) => i !== idx) })} className="text-red-600 hover:text-red-800">Remove</button>
+                    </div>
+                  ))}
+                  <button onClick={() => setEditPoll({ ...editPoll, options: [...editPoll.options, { id: String(Date.now()), text: '', votes: 0 }] })} className="text-blue-600 hover:text-blue-800 text-sm">+ Add option</button>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <input type="date" value={editPoll.startDate} onChange={(e) => setEditPoll({ ...editPoll, startDate: e.target.value })} className="w-full px-3 py-2 border rounded" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <input type="date" value={editPoll.endDate} onChange={(e) => setEditPoll({ ...editPoll, endDate: e.target.value })} className="w-full px-3 py-2 border rounded" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                  <select value={editPoll.visibility} onChange={(e) => setEditPoll({ ...editPoll, visibility: e.target.value as any, allowedRoles: e.target.value === 'restricted' ? editPoll.allowedRoles || ['member'] : undefined })} className="w-full px-3 py-2 border rounded">
+                    <option value="public">Public (within group)</option>
+                    <option value="restricted">Restricted by role</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select value={editPoll.status} onChange={(e) => setEditPoll({ ...editPoll, status: e.target.value as any })} className="w-full px-3 py-2 border rounded">
+                    <option value="active">Active</option>
+                    <option value="completed">Closed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button onClick={() => setEditPoll(null)} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => {
+                if (!editPoll) return;
+                const sanitizedOptions = editPoll.options.map(o => ({ ...o, text: o.text.trim() })).filter(o => o.text.length > 0);
+                const totalVotes = sanitizedOptions.reduce((sum, o) => sum + (o.votes || 0), 0);
+                const payload = { ...editPoll, options: sanitizedOptions, totalVotes } as Voting;
+                updatePoll(payload);
+                setVotings(prev => prev.map(p => p.id === payload.id ? payload : p));
+                setEditPoll(null);
+              }} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
             </div>
           </div>
         </div>

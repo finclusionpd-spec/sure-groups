@@ -119,7 +119,7 @@ export const getGroupAdminNavigation = (): NavigationGroup[] => [
     items: [
       { id: 'wallet-management', label: 'Wallet Management', icon: CreditCard },
       { id: 'referrals-rewards', label: 'Referrals & Rewards', icon: Award },
-      { id: 'benefit-management', label: 'Benefit Management', icon: Gift }
+      { id: 'donation-management', label: 'Donation Management', icon: Heart }
     ]
   },
   {
@@ -223,8 +223,8 @@ export const getVendorNavigation = (): NavigationGroup[] => [
     title: 'Service Management',
     items: [
       { id: 'services', label: 'My Services', icon: Briefcase },
-      { id: 'orders', label: 'Orders & Delivery', icon: ShoppingCart },
-      { id: 'marketplace', label: 'Marketplace Storefront', icon: ShoppingCart }
+      { id: 'vendor-orders', label: 'Orders & Delivery', icon: ShoppingCart },
+      { id: 'vendor-marketplace', label: 'Marketplace Storefront', icon: ShoppingCart }
     ]
   },
   {

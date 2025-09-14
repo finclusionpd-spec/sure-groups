@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Search, Plus, ShoppingCart, Edit, Trash2, Eye, Star, DollarSign, Package, TrendingUp } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Search, Plus, ShoppingCart, Edit, Trash2, Eye, Star, DollarSign, Package, TrendingUp, Check, Image as ImageIcon, Wallet } from 'lucide-react';
+import { getWalletBalance } from '../../services/wallet';
 
 interface Product {
   id: string;
@@ -35,7 +36,8 @@ interface MarketplaceOrder {
 }
 
 export const MarketplaceManagement: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'vendors' | 'analytics'>('products');
+  const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'discounts' | 'services' | 'general' | 'orders' | 'vendors' | 'analytics'>('overview');
+  const donationsWallet = getWalletBalance('1');
   
   const [products, setProducts] = useState<Product[]>([
     {
@@ -139,6 +141,8 @@ export const MarketplaceManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState<'all' | Product['status']>('all');
+  const [vendorFilter, setVendorFilter] = useState<'all' | string>('all');
+  // Date range is display-only (non-editable)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -149,29 +153,62 @@ export const MarketplaceManagement: React.FC = () => {
     category: '',
     vendor: '',
     stock: '',
-    commission: ''
+    commission: '',
+    imageUrl: ''
   });
+  const handleMediaFile = (file?: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setNewProduct(prev => ({ ...prev, imageUrl: String(reader.result || '') }));
+    };
+    reader.readAsDataURL(file);
+  };
 
-  const categories = ['Food & Beverages', 'Arts & Crafts', 'Services', 'Books', 'Clothing', 'Electronics', 'Health', 'Other'];
+  const categories = ['Marketplace', 'Discounts & Offers', 'Professional Services'];
+  const allVendors = useMemo(() => Array.from(new Set(products.map(p => p.vendor))), [products]);
 
-  const filteredProducts = products.filter(product => {
+  const preDateFiltered = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.vendor.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+    const matchesCategory = categoryFilter === 'all' ||
+      (categoryFilter === 'Marketplace' && product.category !== 'Professional Services' && product.category !== 'Discounts & Offers') ||
+      (categoryFilter === 'Professional Services' && product.category === 'Services') ||
+      (categoryFilter === 'Discounts & Offers' && product.category === 'Discounts & Offers') ||
+      product.category === categoryFilter;
     const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
-    return matchesSearch && matchesCategory && matchesStatus;
+    const matchesVendor = vendorFilter === 'all' || product.vendor === vendorFilter;
+    return matchesSearch && matchesCategory && matchesStatus && matchesVendor;
   });
 
+  const filteredProducts = preDateFiltered;
+
+  const dateRangeLabel = useMemo(() => {
+    if (preDateFiltered.length === 0) return 'All time';
+    const timestamps = preDateFiltered.map(p => new Date(p.createdAt).getTime()).filter(n => !isNaN(n));
+    if (timestamps.length === 0) return 'All time';
+    const min = new Date(Math.min(...timestamps));
+    const max = new Date(Math.max(...timestamps));
+    const fmt = (d: Date) => d.toLocaleDateString();
+    return `${fmt(min)} – ${fmt(max)}`;
+  }, [preDateFiltered]);
+
   const handleCreateProduct = () => {
+    if (!newProduct.name.trim()) return alert('Title is required');
+    if (!newProduct.description.trim()) return alert('Description is required');
+    if (!newProduct.category) return alert('Category is required');
+    const priceNum = parseFloat(newProduct.price);
+    if (isNaN(priceNum) || priceNum < 0) return alert('Price must be numeric');
+    if (!newProduct.imageUrl) return alert('Please upload or paste an image URL');
     const product: Product = {
       id: Date.now().toString(),
       ...newProduct,
-      price: parseFloat(newProduct.price) || 0,
+      price: priceNum || 0,
       stock: parseInt(newProduct.stock) || 0,
       commission: parseFloat(newProduct.commission) || 0,
       vendorId: Date.now().toString(),
-      imageUrl: 'https://images.pexels.com/photos/259027/pexels-photo-259027.jpeg?auto=compress&cs=tinysrgb&w=600',
+      imageUrl: newProduct.imageUrl,
       status: 'pending',
       sold: 0,
       rating: 0,
@@ -182,7 +219,7 @@ export const MarketplaceManagement: React.FC = () => {
     };
     setProducts([product, ...products]);
     setNewProduct({
-      name: '', description: '', price: '', category: '', vendor: '', stock: '', commission: ''
+      name: '', description: '', price: '', category: '', vendor: '', stock: '', commission: '', imageUrl: ''
     });
     setShowCreateModal(false);
   };
@@ -222,6 +259,11 @@ export const MarketplaceManagement: React.FC = () => {
   const pendingProducts = products.filter(p => p.status === 'pending').length;
   const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
   const totalOrders = orders.length;
+  const mostPopular = [...products].sort((a,b) => b.sold - a.sold).slice(0, 5);
+  const recentActivity = [
+    ...products.map(p => ({ type: 'listing', at: p.createdAt, title: `New listing: ${p.name}` })),
+    ...orders.map(o => ({ type: 'order', at: o.orderDate, title: `Order ${o.id} - ${o.productName}` }))
+  ].sort((a,b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0,6);
 
   return (
     <div className="p-6">
@@ -275,14 +317,54 @@ export const MarketplaceManagement: React.FC = () => {
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             <button
-              onClick={() => setActiveTab('products')}
+              onClick={() => setActiveTab('overview')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'products'
+                activeTab === 'overview'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Products ({products.length})
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('listings')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'listings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              All Listings ({products.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('discounts')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'discounts'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Discounts & Offers
+            </button>
+            <button
+              onClick={() => setActiveTab('services')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'services'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Professional Services
+            </button>
+            <button
+              onClick={() => setActiveTab('general')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'general'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              General Items
             </button>
             <button
               onClick={() => setActiveTab('orders')}
@@ -293,16 +375,6 @@ export const MarketplaceManagement: React.FC = () => {
               }`}
             >
               Orders ({orders.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('vendors')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'vendors'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Vendors
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
@@ -318,12 +390,69 @@ export const MarketplaceManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Products Tab */}
-      {activeTab === 'products' && (
+      {/* Overview Tab */}
+      {activeTab === 'overview' && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg border p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Wallet & KPIs</h3>
+              <div className="inline-flex items-center space-x-2 text-sm text-gray-700 bg-gray-50 border rounded px-2 py-1">
+                <Wallet className="w-4 h-4 text-emerald-600" />
+                <span>{donationsWallet.currency} {donationsWallet.balance.toFixed(2)}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="p-3 bg-blue-50 rounded border">
+                <div className="text-gray-600">Active Listings</div>
+                <div className="text-2xl font-bold text-blue-700 mt-1">{activeProducts}</div>
+              </div>
+              <div className="p-3 bg-yellow-50 rounded border">
+                <div className="text-gray-600">Pending Approval</div>
+                <div className="text-2xl font-bold text-yellow-700 mt-1">{pendingProducts}</div>
+              </div>
+              <div className="p-3 bg-purple-50 rounded border">
+                <div className="text-gray-600">Sales Volume</div>
+                <div className="text-2xl font-bold text-purple-700 mt-1">${totalRevenue.toFixed(2)}</div>
+              </div>
+              <div className="p-3 bg-green-50 rounded border">
+                <div className="text-gray-600">Orders</div>
+                <div className="text-2xl font-bold text-green-700 mt-1">{totalOrders}</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <div className="space-y-2 text-sm">
+              {recentActivity.map((a, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 rounded hover:bg-gray-50 border">
+                  <span className="text-gray-700">{a.title}</span>
+                  <span className="text-gray-500">{new Date(a.at).toLocaleString()}</span>
+                </div>
+              ))}
+              {recentActivity.length === 0 && (<div className="text-gray-500">No activity yet</div>)}
+            </div>
+          </div>
+          <div className="md:col-span-2 bg-white rounded-lg border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Popular</h3>
+            <div className="grid md:grid-cols-5 gap-4">
+              {mostPopular.map(p => (
+                <div key={p.id} className="border rounded-lg p-3">
+                  <img src={p.imageUrl} alt={p.name} className="w-full h-24 object-cover rounded" />
+                  <div className="mt-2 text-sm font-medium text-gray-900 line-clamp-1">{p.name}</div>
+                  <div className="text-xs text-gray-500">Sold: {p.sold}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Listings Tab */}
+      {activeTab === 'listings' && (
         <>
           {/* Filters */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row md:flex-wrap items-center gap-3">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -357,12 +486,23 @@ export const MarketplaceManagement: React.FC = () => {
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
               </select>
+              <select
+                value={vendorFilter}
+                onChange={e => setVendorFilter(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Vendors</option>
+                {allVendors.map(v => (<option key={v} value={v}>{v}</option>))}
+              </select>
+              <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 select-none cursor-default">
+                Date: {dateRangeLabel}
+              </div>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Product</span>
+                <span>Add Service</span>
               </button>
             </div>
           </div>
@@ -460,6 +600,75 @@ export const MarketplaceManagement: React.FC = () => {
             ))}
           </div>
         </>
+      )}
+
+      {/* Discounts & Offers */}
+      {activeTab === 'discounts' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.filter(p => p.category === 'Discounts & Offers').map((product) => (
+            <div key={product.id} className="bg-white rounded-lg border p-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-lg font-semibold text-gray-900 line-clamp-1">{product.name}</div>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(product.status)}`}>{product.status}</span>
+              </div>
+              <div className="text-sm text-gray-600 mb-2">{product.description}</div>
+              <div className="text-sm text-gray-500 mb-3">Vendor: {product.vendor}</div>
+              <div className="flex items-center justify-between">
+                <button onClick={() => setSelectedProduct(product)} className="text-blue-600 hover:text-blue-800">Details</button>
+                <div className="space-x-2 text-sm">
+                  <button onClick={() => handleUpdateProductStatus(product.id, 'active')} className="text-green-600">Approve</button>
+                  <button onClick={() => handleUpdateProductStatus(product.id, 'rejected')} className="text-red-600">Reject</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Professional Services */}
+      {activeTab === 'services' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.filter(p => p.category === 'Services').map((product) => (
+            <div key={product.id} className="bg-white rounded-lg border p-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-lg font-semibold text-gray-900 line-clamp-1">{product.name}</div>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(product.status)}`}>{product.status}</span>
+              </div>
+              <div className="text-sm text-gray-600 mb-2">{product.description}</div>
+              <div className="text-sm text-gray-500 mb-3">Vendor: {product.vendor}</div>
+              <div className="flex items-center justify-between">
+                <button onClick={() => setSelectedProduct(product)} className="text-blue-600 hover:text-blue-800">Details</button>
+                <div className="space-x-2 text-sm">
+                  <button onClick={() => handleUpdateProductStatus(product.id, 'active')} className="text-green-600">Approve</button>
+                  <button onClick={() => handleUpdateProductStatus(product.id, 'rejected')} className="text-red-600">Reject</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* General Items */}
+      {activeTab === 'general' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.filter(p => p.category !== 'Services' && p.category !== 'Discounts & Offers').map((product) => (
+            <div key={product.id} className="bg-white rounded-lg border p-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-lg font-semibold text-gray-900 line-clamp-1">{product.name}</div>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(product.status)}`}>{product.status}</span>
+              </div>
+              <div className="text-sm text-gray-600 mb-2">{product.description}</div>
+              <div className="text-sm text-gray-500 mb-3">Vendor: {product.vendor}</div>
+              <div className="flex items-center justify-between">
+                <button onClick={() => setSelectedProduct(product)} className="text-blue-600 hover:text-blue-800">Details</button>
+                <div className="space-x-2 text-sm">
+                  <button onClick={() => handleUpdateProductStatus(product.id, 'active')} className="text-green-600">Approve</button>
+                  <button onClick={() => handleUpdateProductStatus(product.id, 'rejected')} className="text-red-600">Reject</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Orders Tab */}
@@ -703,8 +912,22 @@ export const MarketplaceManagement: React.FC = () => {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Product</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Service / Product</h3>
             <div className="space-y-4">
+              {newProduct.imageUrl ? (
+                <div className="w-full h-40 rounded-lg overflow-hidden border">
+                  {/* Basic preview for images/videos */}
+                  {newProduct.imageUrl.startsWith('data:video') ? (
+                    <video src={newProduct.imageUrl} className="w-full h-full object-cover" controls />
+                  ) : (
+                    <img src={newProduct.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  )}
+                </div>
+              ) : (
+                <div className="w-full h-20 rounded-lg border border-dashed flex items-center justify-center text-gray-500 text-sm">
+                  <ImageIcon className="w-4 h-4 mr-2" /> Add media (image/video)
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
                 <input
@@ -713,6 +936,22 @@ export const MarketplaceManagement: React.FC = () => {
                   onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Media Upload</label>
+                <div className="flex items-center space-x-3">
+                  <label className="inline-flex items-center px-3 py-2 border rounded cursor-pointer text-sm text-gray-700 hover:bg-gray-50">
+                    <input type="file" accept="image/*,video/*" onChange={(e) => handleMediaFile(e.target.files?.[0])} className="hidden" />
+                    <ImageIcon className="w-4 h-4 mr-2" /> Upload
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={newProduct.imageUrl}
+                    onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>

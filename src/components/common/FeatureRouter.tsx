@@ -67,6 +67,8 @@ import { DatabaseManagement } from '../features/DatabaseManagement';
 import { Meetings } from '../features/Meetings';
 import { Votings } from '../features/Votings';
 import { Donations } from '../features/Donations';
+import { DonationManagement } from '../features/DonationManagement';
+import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
 
 interface FeatureRouterProps {
   featureId: string;
@@ -167,9 +169,9 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       );
     case 'services':
       return <VendorServices />;
-    case 'orders':
+    case 'vendor-orders':
       return <VendorOrders />;
-    case 'marketplace':
+    case 'vendor-marketplace':
       return <VendorMarketplace />;
     case 'transactions':
       return <VendorTransactions />;
@@ -223,7 +225,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <TicketingSystem />;
     case 'group-management':
       return <GroupManagement />;
-    // Removed 'approval-workflow' explicit component to avoid missing import; falling back to default placeholder
+    case 'approval-workflow':
+      return <ApprovalWorkflow />;
     case 'event-management':
       return <EventManagement />;
     case 'feature-management':
@@ -249,20 +252,15 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <GroupSetup />;
     case 'membership-management':
       return <MembershipManagement />;
-    case 'events':
-      return <EventManagement />;
     case 'content-oversight':
       return <ContentOversight />;
     case 'performance-tracking':
       return <PerformanceTracking />;
-    case 'reports-flags':
-      return <ReportsFlags />;
-    case 'wallet-management':
-      return <WalletManagement />;
-    case 'marketplace-management':
-      return <MarketplaceManagement />;
+    
     case 'benefit-management':
       return <BenefitManagement />;
+    case 'donation-management':
+      return <DonationManagement />;
     default:
       return (
         <div className="p-6">

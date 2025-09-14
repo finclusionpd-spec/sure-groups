@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, X, Play, CheckCircle } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface TourStep {
   id: string;
@@ -10,62 +11,44 @@ interface TourStep {
 }
 
 export const UserTourGuide: React.FC = () => {
+  const { user } = useAuth();
+  const isGroupAdmin = user?.role === 'group-admin';
   const [currentStep, setCurrentStep] = useState(0);
   const [showTour, setShowTour] = useState(false);
 
-  const tourSteps: TourStep[] = [
-    {
-      id: '1',
-      title: 'Welcome to SureGroups (Member)',
-      description: 'Explore your dashboard, see updates, and quick actions built for members.',
-      feature: 'Member Dashboard',
-      completed: false
-    },
-    {
-      id: '2',
-      title: 'My Groups',
-      description: 'Browse your groups, unread messages, and upcoming events. Discover new groups and manage invitations.',
-      feature: 'My Groups',
-      completed: false
-    },
-    {
-      id: '3',
-      title: 'Marketplace & Orders',
-      description: 'Find deals and professional services. Review and track your orders.',
-      feature: 'Marketplace, Orders',
-      completed: false
-    },
-    {
-      id: '4',
-      title: 'Wallet & Donations',
-      description: 'Check your SureBanker Wallet, donate to general causes or campaigns, and download receipts.',
-      feature: 'Wallet, Donations',
-      completed: false
-    },
-    {
-      id: '5',
-      title: 'Events & Calendar',
-      description: 'View upcoming events in list or calendar view. RSVP and set reminders.',
-      feature: 'Events',
-      completed: false
-    },
-    {
-      id: '6',
-      title: 'Notifications & Chat',
-      description: 'Stay on top of updates and chat with your groups. Enable notifications.',
-      feature: 'Notifications, Chat',
-      completed: false
-    },
-    {
-      id: '7',
-      title: 'Profile & Reviews',
-      description: 'Manage your profile and leave ratings/reviews for services.',
-      feature: 'Profile, Ratings & Reviews',
-      completed: false
-    }
+  const memberSteps: TourStep[] = [
+    { id: 'm1', title: 'Welcome to SureGroups (Member)', description: 'Explore your dashboard, see updates, and quick actions built for members.', feature: 'Member Dashboard', completed: false },
+    { id: 'm2', title: 'My Groups', description: 'Browse your groups, unread messages, and upcoming events. Discover new groups and manage invitations.', feature: 'My Groups', completed: false },
+    { id: 'm3', title: 'Marketplace & Orders', description: 'Find deals and professional services. Review and track your orders.', feature: 'Marketplace, Orders', completed: false },
+    { id: 'm4', title: 'Wallet & Donations', description: 'Check your SureBanker Wallet, donate to general causes or campaigns, and download receipts.', feature: 'Wallet, Donations', completed: false },
+    { id: 'm5', title: 'Events & Calendar', description: 'View upcoming events in list or calendar view. RSVP and set reminders.', feature: 'Events', completed: false },
+    { id: 'm6', title: 'Notifications & Chat', description: 'Stay on top of updates and chat with your groups. Enable notifications.', feature: 'Notifications, Chat', completed: false },
+    { id: 'm7', title: 'Profile & Reviews', description: 'Manage your profile and leave ratings/reviews for services.', feature: 'Profile, Ratings & Reviews', completed: false },
   ];
 
-  const [steps, setSteps] = useState(tourSteps);
+  const adminSteps: TourStep[] = [
+    { id: 'a1', title: 'Dashboard & Quick Actions', description: 'Get an overview of your group with key metrics and shortcuts.', feature: 'Group Admin Dashboard', completed: false },
+    { id: 'a2', title: 'Group Setup', description: 'Configure group details, profile image, categories, and visibility.', feature: 'Group Setup', completed: false },
+    { id: 'a3', title: 'Membership Management', description: 'Manage members, roles, invitations, and approvals.', feature: 'Membership Management', completed: false },
+    { id: 'a4', title: 'Approval Workflow', description: 'Review pending requests: membership, content, events, marketplace, donations.', feature: 'Approval Workflow', completed: false },
+    { id: 'a5', title: 'Events Management', description: 'Create events, upload banners, manage RSVPs, and send reminders.', feature: 'Events Management', completed: false },
+    { id: 'a6', title: 'Voting Management', description: 'Create polls, manage visibility, monitor results, and close polls.', feature: 'Voting Management', completed: false },
+    { id: 'a7', title: 'Marketplace Management', description: 'Approve listings, manage categories, add services, and track orders.', feature: 'Marketplace Management', completed: false },
+    { id: 'a8', title: 'Donation Management', description: 'Create campaigns, track donations, and view analytics.', feature: 'Donation Management', completed: false },
+    { id: 'a9', title: 'Wallet Management (SureBanker)', description: 'Send/receive funds, fund/withdraw with PIN, and filter transactions.', feature: 'Wallet Management', completed: false },
+    { id: 'a10', title: 'Performance Tracking', description: 'View group KPIs, trends, and recent activity.', feature: 'Performance Tracking', completed: false },
+    { id: 'a11', title: 'Ratings & Reviews', description: 'Monitor and respond to ratings and reviews across services.', feature: 'Ratings & Reviews', completed: false },
+    { id: 'a12', title: 'Notifications & Chat', description: 'Receive alerts for approvals and updates. Communicate with members.', feature: 'Notifications, Chats', completed: false },
+  ];
+
+  const initialSteps = useMemo(() => (isGroupAdmin ? adminSteps : memberSteps), [isGroupAdmin]);
+  const [steps, setSteps] = useState<TourStep[]>(initialSteps);
+
+  useEffect(() => {
+    // Reset tour when role context changes
+    setSteps(initialSteps.map(s => ({ ...s, completed: false })));
+    setCurrentStep(0);
+  }, [initialSteps]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -103,8 +86,8 @@ export const UserTourGuide: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Member Tour Guide</h1>
-        <p className="text-gray-600">Get familiar with key member features and capabilities</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{isGroupAdmin ? 'Group Admin Tour Guide' : 'Member Tour Guide'}</h1>
+        <p className="text-gray-600">{isGroupAdmin ? 'Walk through Group Admin features and workflows' : 'Get familiar with key member features and capabilities'}</p>
       </div>
 
       {/* Progress Overview */}
@@ -226,37 +209,87 @@ export const UserTourGuide: React.FC = () => {
         </div>
       )}
 
-      {/* Feature Highlights (Member) */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">My Groups</h3>
-          <ul className="space-y-2 text-sm text-gray-600">
-            <li>• Overview of your groups and unread messages</li>
-            <li>• Discover and request to join new groups</li>
-            <li>• Accept or decline invitations</li>
-            <li>• Chat with group members</li>
-          </ul>
+      {/* Feature Highlights */}
+      {isGroupAdmin ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Dashboard & Approvals</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Quick Actions and recent group updates</li>
+              <li>• Approval Workflow for pending requests</li>
+              <li>• Navigate to Events, Voting, Marketplace</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Events & Voting</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Create events with banners and RSVP settings</li>
+              <li>• Create polls, edit, and view results</li>
+              <li>• Send reminders and announcements</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Marketplace & Donations</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Approve/reject listings and add services</li>
+              <li>• Create donation campaigns and track donors</li>
+              <li>• View wallet balances and allocate funds</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Wallet & Performance</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Send, receive, fund, and withdraw with PIN</li>
+              <li>• Filter transactions and export summaries</li>
+              <li>• Track group KPIs and trends</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Membership & Reviews</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Manage members and roles</li>
+              <li>• Monitor ratings & reviews</li>
+              <li>• Configure group settings</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Notifications & Chat</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Approval and event notifications</li>
+              <li>• Group announcements and messaging</li>
+            </ul>
+          </div>
         </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Marketplace & Orders</h3>
-          <ul className="space-y-2 text-sm text-gray-600">
-            <li>• Browse products, discounts and professional services</li>
-            <li>• Place orders and track delivery status</li>
-            <li>• View and download receipts</li>
-          </ul>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">My Groups</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Overview of your groups and unread messages</li>
+              <li>• Discover and request to join new groups</li>
+              <li>• Accept or decline invitations</li>
+              <li>• Chat with group members</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Marketplace & Orders</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Browse products, discounts and professional services</li>
+              <li>• Place orders and track delivery status</li>
+              <li>• View and download receipts</li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Wallet, Donations & Events</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Check wallet balance and transaction history</li>
+              <li>• Donate to causes and download receipts</li>
+              <li>• Switch between list and calendar views for events</li>
+              <li>• RSVP and set reminders</li>
+            </ul>
+          </div>
         </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Wallet, Donations & Events</h3>
-          <ul className="space-y-2 text-sm text-gray-600">
-            <li>• Check wallet balance and transaction history</li>
-            <li>• Donate to causes and download receipts</li>
-            <li>• Switch between list and calendar views for events</li>
-            <li>• RSVP and set reminders</li>
-          </ul>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
