@@ -7,21 +7,19 @@ import { LoginForm } from './components/auth/LoginForm';
 import { ForgotPasswordForm } from './components/auth/ForgotPasswordForm';
 import { EmailVerificationPage } from './components/auth/EmailVerificationPage';
 import { DemoRoleSelection } from './components/auth/DemoRoleSelection';
+import SignUpWizard from './components/auth/SignUpWizard';
 import { DashboardRouter } from './components/common/DashboardRouter';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import KycFlowPage from './components/pages/KycFlowPage';
+import TourPage from './components/pages/TourPage';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route 
-        path="/signup" 
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpForm />
-        } 
-      />
+      <Route path="/" element={<Navigate to="/signup" replace />} />
+      <Route path="/signup" element={<SignUpWizard />} />
       <Route 
         path="/login" 
         element={
@@ -56,6 +54,8 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
+      <Route path="/kyc" element={<ProtectedRoute><KycFlowPage /></ProtectedRoute>} />
+      <Route path="/tour" element={<ProtectedRoute><TourPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -4,12 +4,22 @@ import { User, AuthState, UserRole } from '../types';
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (fullName: string, email: string, password: string, role: UserRole) => Promise<boolean>;
+  completeSignup: (data: {
+    role: UserRole;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    password: string;
+  }) => Promise<boolean>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<boolean>;
   verifyEmail: (token: string) => Promise<boolean>;
   startDemo: (role: UserRole) => void;
   setUser: (user: User | null) => void;
   resetPassword: (token: string, password: string) => Promise<boolean>;
+  updateKycTier: (tier: 'tier1' | 'tier2' | 'tier3', status: 'pending' | 'verified' | 'skipped') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,22 +60,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
     } else if (storedDemo) {
       const demoUser = JSON.parse(storedDemo);
-      setAuthState({
-        user: demoUser,
-        isAuthenticated: true,
-        isLoading: false,
-        isDemoMode: true,
-      });
-    } else if (isDemoEnv) {
-      const demoUser: User = {
-        id: 'demo-group-admin',
-        fullName: 'Demo Group Admin',
-        email: 'demo-group-admin@suregroups.com',
-        role: 'group-admin',
-        isEmailVerified: true,
-        createdAt: new Date().toISOString(),
-      };
-      localStorage.setItem('sure-groups-demo', JSON.stringify(demoUser));
       setAuthState({
         user: demoUser,
         isAuthenticated: true,
@@ -147,6 +141,67 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const completeSignup = async (data: {
+    role: UserRole;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    password: string;
+  }): Promise<boolean> => {
+    try {
+      setAuthState(prev => ({ ...prev, isLoading: true }));
+      await new Promise(resolve => setTimeout(resolve, 600));
+      const fullName = [data.firstName, data.middleName, data.lastName].filter(Boolean).join(' ');
+      const mockUser: User = {
+        id: Date.now().toString(),
+        fullName,
+        firstName: data.firstName,
+        middleName: data.middleName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        isEmailVerified: true,
+        kycStatus: isDemoEnv ? 'verified' : 'pending',
+        kycTiers: isDemoEnv
+          ? { tier1: 'verified', tier2: 'verified', tier3: 'verified' }
+          : {
+              tier1: 'pending',
+              tier2: 'pending',
+              tier3: (data.role === 'vendor' || data.role === 'group-admin') ? 'pending' : 'skipped',
+            },
+        createdAt: new Date().toISOString(),
+      };
+      localStorage.setItem('sure-groups-user', JSON.stringify(mockUser));
+      setAuthState({
+        user: mockUser,
+        isAuthenticated: true,
+        isLoading: false,
+        isDemoMode: isDemoEnv,
+      });
+      return true;
+    } catch (e) {
+      setAuthState(prev => ({ ...prev, isLoading: false }));
+      return false;
+    }
+  };
+
+  const updateKycTier = (tier: 'tier1' | 'tier2' | 'tier3', status: 'pending' | 'verified' | 'skipped') => {
+    setAuthState(prev => {
+      const currentUser = prev.user;
+      if (!currentUser) return prev;
+      const updatedTiers = { ...(currentUser.kycTiers || {}), [tier]: status } as NonNullable<User['kycTiers']>;
+      const requiredTiers: Array<'tier1' | 'tier3'> = ['tier1', ...(currentUser.role === 'vendor' || currentUser.role === 'group-admin' ? ['tier3'] : [])];
+      const allRequiredVerified = requiredTiers.every(t => updatedTiers[t] === 'verified');
+      const overall: 'pending' | 'verified' | 'skipped' = allRequiredVerified ? 'verified' : (Object.values(updatedTiers).includes('pending') ? 'pending' : 'skipped');
+      const nextUser = { ...currentUser, kycTiers: updatedTiers, kycStatus: overall };
+      localStorage.setItem('sure-groups-user', JSON.stringify(nextUser));
+      return { ...prev, user: nextUser };
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem('sure-groups-user');
     localStorage.removeItem('sure-groups-demo');
@@ -222,12 +277,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     ...authState,
     login,
     signup,
+    completeSignup,
     logout,
     forgotPassword,
     verifyEmail,
     resetPassword,
     startDemo,
     setUser,
+    updateKycTier,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Header } from '../common/Header';
+import { KycBanner } from '../common/KycBanner';
 import { Sidebar } from '../common/Sidebar';
 import { MetricCard } from '../common/MetricCard';
 import { FeatureRouter } from '../common/FeatureRouter';
@@ -270,6 +271,7 @@ export const VendorDashboard: React.FC = () => {
         <Header title={activeFeature ? "Vendor Portal" : "Vendor Dashboard"} />
         
         <main className="flex-1 overflow-y-auto p-6">
+          <KycBanner />
           {activeFeature ? (
             <div>
               <button

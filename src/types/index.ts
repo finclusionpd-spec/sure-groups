@@ -1,14 +1,23 @@
 import { DivideIcon as LucideIcon } from 'lucide-react';
 
-export type UserRole = 'super-admin' | 'product-admin' | 'group-admin' | 'member' | 'vendor';
 export type UserRole = 'super-admin' | 'product-admin' | 'group-admin' | 'member' | 'vendor' | 'developer';
 
 export interface User {
   id: string;
   fullName: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   email: string;
+  phone?: string;
   role: UserRole;
   isEmailVerified: boolean;
+  kycStatus?: 'pending' | 'verified' | 'skipped';
+  kycTiers?: {
+    tier1?: 'pending' | 'verified' | 'skipped';
+    tier2?: 'pending' | 'verified' | 'skipped';
+    tier3?: 'pending' | 'verified' | 'skipped';
+  };
   createdAt: string;
 }
 
