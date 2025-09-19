@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LandingPage } from './components/pages/LandingPage';
-import { SignUpForm } from './components/auth/SignUpForm';
 import { LoginForm } from './components/auth/LoginForm';
 import { ForgotPasswordForm } from './components/auth/ForgotPasswordForm';
 import { EmailVerificationPage } from './components/auth/EmailVerificationPage';
@@ -18,7 +17,13 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/signup" replace />} />
+      <Route 
+        path="/" 
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />
+        } 
+      />
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/signup" element={<SignUpWizard />} />
       <Route 
         path="/login" 
@@ -56,7 +61,12 @@ const AppRoutes: React.FC = () => {
       />
       <Route path="/kyc" element={<ProtectedRoute><KycFlowPage /></ProtectedRoute>} />
       <Route path="/tour" element={<ProtectedRoute><TourPage /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route 
+        path="*" 
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/" replace />
+        } 
+      />
     </Routes>
   );
 };

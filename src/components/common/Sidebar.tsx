@@ -48,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect,
         className={`
           fixed top-0 left-0 h-full bg-white border-r border-gray-200 transition-transform duration-300 z-50
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static lg:block w-72
+          lg:translate-x-0 lg:static lg:block w-80
         `}
       >
         <div className="flex flex-col h-full">
@@ -91,15 +91,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect,
                       key={item.id}
                       onClick={() => handleItemClick(item.id)}
                       className={`
-                        w-full flex items-center space-x-3 px-6 py-2 text-sm transition-colors
+                        w-full flex items-start space-x-3 px-6 py-3 text-sm transition-colors
                         ${item.active || activeFeature === item.id
                           ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
                           : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         }
                       `}
                     >
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.label}</span>
+                      <item.icon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span className="text-left leading-tight">{item.label}</span>
                     </button>
                   ))}
                 </div>
