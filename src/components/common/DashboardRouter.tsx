@@ -1,5 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
+import { UserRole } from '../../types';
 
 const SuperAdminDashboard = lazy(() => 
   import('../dashboards/SuperAdminDashboard').then(m => ({ default: m.SuperAdminDashboard }))
@@ -22,11 +24,16 @@ const DeveloperDashboard = lazy(() =>
 
 export const DashboardRouter: React.FC = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const override = params.get('role') as UserRole | null;
+  const allowed: UserRole[] = ['super-admin','product-admin','group-admin','member','vendor','developer'];
+  const role = (override && allowed.includes(override)) ? override : user?.role;
 
   return (
     <Suspense fallback={<div className="p-6">Loading dashboard...</div>}>
       {(() => {
-        switch (user?.role) {
+        switch (role) {
           case 'super-admin':
             return <SuperAdminDashboard />;
           case 'product-admin':

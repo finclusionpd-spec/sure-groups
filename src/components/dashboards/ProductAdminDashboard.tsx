@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { Header } from '../common/Header';
+import { KycBanner } from '../common/KycBanner';
 import { Sidebar } from '../common/Sidebar';
 import { MetricCard } from '../common/MetricCard';
 import { FeatureRouter } from '../common/FeatureRouter';
@@ -38,6 +39,7 @@ export const ProductAdminDashboard: React.FC = () => {
         <Header title={activeFeature ? "Product Management" : "Product Overview"} />
         
         <main className="flex-1 overflow-y-auto p-6">
+          <KycBanner />
           {activeFeature ? (
             <div>
               <button

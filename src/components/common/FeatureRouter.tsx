@@ -27,7 +27,6 @@ import { NotificationsAlerts } from '../features/NotificationsAlerts';
 import { ChatMessaging } from '../features/ChatMessaging';
 import { RatingsReviews } from '../features/RatingsReviews';
 import { ProfileSettings } from '../features/ProfileSettings';
-import { GroupSetup } from '../features/GroupSetup';
 import { MembershipManagement } from '../features/MembershipManagement';
 import { PerformanceTracking } from '../features/PerformanceTracking';
 import { ContentOversight } from '../features/ContentOversight';
@@ -69,6 +68,8 @@ import { Donations } from '../features/Donations';
 import { DonationManagement } from '../features/DonationManagement';
 import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
 import { VendorWallet } from '../features/VendorWallet';
+import { AssociationRegistrationPage } from '../features/AssociationRegistration';
+import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
@@ -241,8 +242,6 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
           </div>
         </div>
       );
-    case 'group-setup':
-      return <GroupSetup />;
     case 'membership-management':
       return <MembershipManagement />;
     case 'content-oversight':
@@ -254,6 +253,10 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <BenefitManagement />;
     case 'donation-management':
       return <DonationManagement />;
+    case 'association-registration':
+      return <AssociationRegistrationPage />;
+    case 'association-registration-management':
+      return <AssociationRegistrationManagement />;
     default:
       return (
         <div className="p-6">
