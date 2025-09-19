@@ -25,7 +25,8 @@ import {
   Heart,
   MapPin,
   Zap,
-  Database
+  Database,
+  Building2
 } from 'lucide-react';
 import { NavigationGroup } from '../types';
 
@@ -99,9 +100,9 @@ export const getGroupAdminNavigation = (): NavigationGroup[] => [
     title: 'Group Management',
     items: [
       { id: 'group-management', label: 'Group Management', icon: Users },
-      { id: 'group-setup', label: 'Group Setup', icon: Settings },
       { id: 'membership-management', label: 'Membership Management', icon: UserPlus },
       { id: 'approval-workflow', label: 'Approval Workflow', icon: Shield },
+      { id: 'association-registration', label: 'Association Registration', icon: Building2 },
       { id: 'events', label: 'Events Management', icon: Calendar },
       { id: 'votings', label: 'Voting Management', icon: Target },
       { id: 'content-oversight', label: 'Content Oversight', icon: MessageSquare }
@@ -198,7 +199,8 @@ export const getSuperAdminNavigation = (): NavigationGroup[] => [
     items: [
       { id: 'ticketing-system', label: 'Ticketing System', icon: FileText },
       { id: 'group-management', label: 'Group Management', icon: Users },
-      { id: 'event-management', label: 'Event Management', icon: Calendar }
+      { id: 'event-management', label: 'Event Management', icon: Calendar },
+      { id: 'association-registration-management', label: 'Association Registration', icon: Building2 }
     ]
   },
   {
