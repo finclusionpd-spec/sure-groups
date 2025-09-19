@@ -18,7 +18,7 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/signup" replace />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/signup" element={<SignUpWizard />} />
       <Route 
         path="/login" 

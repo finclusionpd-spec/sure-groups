@@ -39,7 +39,7 @@ export const GroupAdminDashboard: React.FC = () => {
       label: 'Create Group', 
       icon: Settings, 
       color: 'bg-blue-500',
-      action: () => setActiveFeature('group-setup')
+      action: () => setActiveFeature('group-management')
     },
     { 
       id: 'manage-members', 

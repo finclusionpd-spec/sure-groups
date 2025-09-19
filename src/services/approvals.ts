@@ -1,4 +1,3 @@
-import { addNotification } from './notifications';
 import { UserRole } from '../types';
 
 export type ApprovalType = 'membership' | 'content' | 'event' | 'marketplace' | 'donation';
@@ -57,14 +56,7 @@ export function createApproval(groupId: string, req: Omit<ApprovalRequest, 'id' 
   };
   const list = [item, ...read(groupId)];
   write(groupId, list);
-  addNotification({
-    title: 'New Approval Request',
-    message: `${item.requesterName} submitted a ${item.type} request`,
-    type: 'group',
-    priority: 'high',
-    actionUrl: '/dashboard?feature=approval-workflow',
-    groupName: item.groupName,
-  });
+  // Approval request created
   return item;
 }
 
@@ -82,13 +74,7 @@ export function resolveApproval(groupId: string, approvalId: string, action: 'ap
   };
   list[idx] = updated;
   write(groupId, list);
-  addNotification({
-    title: `Request ${status}`,
-    message: `Your ${updated.type} request was ${status} by ${admin.name}`,
-    type: 'group',
-    priority: 'medium',
-    groupName: updated.groupName,
-  });
+  // Approval request resolved
   return updated;
 }
 

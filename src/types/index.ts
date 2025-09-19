@@ -350,3 +350,74 @@ export interface PollData {
   visibility: 'public' | 'restricted';
   allowedRoles?: UserRole[];
 }
+
+// Association Registration Types
+export type AssociationType = 'NGO' | 'Cooperative' | 'Professional Body' | 'Community Group' | 'Religious Organization' | 'Trade Union' | 'Other';
+
+export type RegistrationOption = 'CAC Registration' | 'Regular Association Registration' | 'Professional Body Registration' | 'Religious Organization Registration' | 'Other';
+
+export type RegistrationStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'under_review';
+
+export interface AssociationRegistration {
+  id: string;
+  groupId: string;
+  groupName: string;
+  adminId: string;
+  adminName: string;
+  
+  // Association Details
+  associationName: string;
+  associationType: AssociationType;
+  registrationOption: RegistrationOption;
+  description: string;
+  
+  // Contact Details
+  contactPersonName: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  
+  // Supporting Documents
+  documents: AssociationDocument[];
+  
+  // Status and Processing
+  status: RegistrationStatus;
+  submittedAt?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  rejectionReason?: string;
+  notes?: string;
+  
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AssociationDocument {
+  id: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileUrl: string;
+  documentType: 'constitution' | 'existing_registration' | 'proof_of_members' | 'financial_statement' | 'other';
+  uploadedAt: string;
+  description?: string;
+}
+
+export interface AssociationRegistrationFormData {
+  associationName: string;
+  associationType: AssociationType;
+  registrationOption: RegistrationOption;
+  description: string;
+  contactPersonName: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  documents: File[];
+}
