@@ -355,70 +355,70 @@ export const VendorManagement: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white">
-              <Users className="w-6 h-6" />
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <Users className="w-5 h-5" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Vendors</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalVendors}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">Total Vendors</p>
+              <p className="text-xl font-bold text-gray-900">{stats.totalVendors}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white">
-              <UserCheck className="w-6 h-6" />
+            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <UserCheck className="w-5 h-5" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Vendors</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.activeVendors}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">Active Vendors</p>
+              <p className="text-xl font-bold text-gray-900">{stats.activeVendors}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center text-white">
-              <AlertCircle className="w-6 h-6" />
+            <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <AlertCircle className="w-5 h-5" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending KYC</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.pendingKYC}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">Pending KYC</p>
+              <p className="text-xl font-bold text-gray-900">{stats.pendingKYC}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white">
-              <UserX className="w-6 h-6" />
+            <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <UserX className="w-5 h-5" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Suspended</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.suspendedVendors}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">Suspended</p>
+              <p className="text-xl font-bold text-gray-900">{stats.suspendedVendors}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white">
-              <DollarSign className="w-6 h-6" />
+            <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <DollarSign className="w-5 h-5" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">₦{stats.totalRevenue.toLocaleString()}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">Total Revenue</p>
+              <p className="text-xl font-bold text-gray-900">₦{stats.totalRevenue.toLocaleString()}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white">
-              <Star className="w-6 h-6" />
+            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <Star className="w-5 h-5" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Avg Rating</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.averageRating.toFixed(1)}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">Avg Rating</p>
+              <p className="text-xl font-bold text-gray-900">{stats.averageRating.toFixed(1)}</p>
             </div>
           </div>
         </div>
@@ -544,27 +544,27 @@ export const VendorManagement: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KYC</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">Vendor</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">KYC</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">Services</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">Rating</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">Revenue</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[160px]">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredVendors.map((vendor) => (
                 <tr key={vendor.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
                       <div className="text-sm text-gray-500">{vendor.businessName}</div>
                       <div className="text-xs text-gray-400">{vendor.email}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-2">
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="flex flex-col space-y-1">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getKycTierColor(vendor.kycTier)}`}>
                         Tier {vendor.kycTier}
                       </span>
@@ -573,25 +573,25 @@ export const VendorManagement: React.FC = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{vendor.activeServices}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{vendor.activeServices}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-yellow-400 mr-1" />
                       <span className="text-sm text-gray-900">{vendor.rating}</span>
                       <span className="text-xs text-gray-500 ml-1">({vendor.reviewCount})</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₦{vendor.totalRevenue.toLocaleString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">₦{vendor.totalRevenue.toLocaleString()}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(vendor.status)}`}>
                       {vendor.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-1">
                       <button
                         onClick={() => handleViewVendor(vendor)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="p-1 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
@@ -600,7 +600,7 @@ export const VendorManagement: React.FC = () => {
                         <button
                           onClick={() => handleApproveVendor(vendor.id)}
                           disabled={isLoading}
-                          className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                          className="p-1 text-green-600 hover:text-green-900 hover:bg-green-50 rounded disabled:opacity-50"
                           title="Approve Vendor"
                         >
                           <UserCheck className="w-4 h-4" />
@@ -609,7 +609,7 @@ export const VendorManagement: React.FC = () => {
                       <button
                         onClick={() => handleSuspendVendor(vendor.id)}
                         disabled={isLoading}
-                        className="text-orange-600 hover:text-orange-900 disabled:opacity-50"
+                        className="p-1 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded disabled:opacity-50"
                         title={vendor.status === 'active' ? 'Suspend Vendor' : 'Activate Vendor'}
                       >
                         {vendor.status === 'active' ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
@@ -617,7 +617,7 @@ export const VendorManagement: React.FC = () => {
                       <button
                         onClick={() => handleDeleteVendor(vendor.id)}
                         disabled={isLoading}
-                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                        className="p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded disabled:opacity-50"
                         title="Delete Vendor"
                       >
                         <Trash2 className="w-4 h-4" />
