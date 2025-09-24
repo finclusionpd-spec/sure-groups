@@ -167,6 +167,12 @@ export const getProductAdminNavigation = (): NavigationGroup[] => [
     ]
   },
   {
+    title: 'Analytics & Reports',
+    items: [
+      { id: 'analytics-reports', label: 'Analytics & Reports', icon: TrendingUp }
+    ]
+  },
+  {
     title: 'System Oversight',
     items: [
       { id: 'database-management', label: 'Database Management', icon: Database },

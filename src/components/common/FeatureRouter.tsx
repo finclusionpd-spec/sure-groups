@@ -70,6 +70,7 @@ import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
 import { VendorWallet } from '../features/VendorWallet';
 import { AssociationRegistrationPage } from '../features/AssociationRegistration';
 import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
+import { AnalyticsReports } from '../features/AnalyticsReports';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
@@ -257,6 +258,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <AssociationRegistrationPage />;
     case 'association-registration-management':
       return <AssociationRegistrationManagement />;
+    case 'analytics-reports':
+      return <AnalyticsReports />;
     default:
       return (
         <div className="p-6">
