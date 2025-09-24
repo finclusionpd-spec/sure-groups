@@ -34,6 +34,7 @@ import { BenefitManagement } from '../features/BenefitManagement';
 import { MarketplaceManagement } from '../features/MarketplaceManagement';
 import { VendorTourGuide } from '../features/VendorTourGuide';
 import { VendorServices } from '../features/VendorServices';
+import { VendorManagement } from '../features/VendorManagement';
 import { VendorOrders } from '../features/VendorOrders';
 import { VendorTransactions } from '../features/VendorTransactions';
 import { VendorMarketing } from '../features/VendorMarketing';
@@ -191,7 +192,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'members-management':
       return <UserManagement />;
     case 'vendors-management':
-      return <VendorServices />;
+      return <VendorManagement />;
     case 'chat-management':
       return <ChatMessaging />;
     case 'wallet-management':
