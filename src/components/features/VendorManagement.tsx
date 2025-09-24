@@ -355,70 +355,70 @@ export const VendorManagement: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-              <Users className="w-5 h-5" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Vendors</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalVendors}</p>
             </div>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-600 truncate">Total Vendors</p>
-              <p className="text-xl font-bold text-gray-900">{stats.totalVendors}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-600 truncate">Active Vendors</p>
-              <p className="text-xl font-bold text-gray-900">{stats.activeVendors}</p>
+            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white">
+              <Users className="w-6 h-6" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-              <AlertCircle className="w-5 h-5" />
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Active Vendors</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.activeVendors}</p>
             </div>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-600 truncate">Pending KYC</p>
-              <p className="text-xl font-bold text-gray-900">{stats.pendingKYC}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-              <UserX className="w-5 h-5" />
-            </div>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-600 truncate">Suspended</p>
-              <p className="text-xl font-bold text-gray-900">{stats.suspendedVendors}</p>
+            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white">
+              <UserCheck className="w-6 h-6" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-              <DollarSign className="w-5 h-5" />
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pending KYC</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.pendingKYC}</p>
             </div>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-600 truncate">Total Revenue</p>
-              <p className="text-xl font-bold text-gray-900">₦{stats.totalRevenue.toLocaleString()}</p>
+            <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center text-white">
+              <AlertCircle className="w-6 h-6" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-              <Star className="w-5 h-5" />
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Suspended</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.suspendedVendors}</p>
             </div>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-600 truncate">Avg Rating</p>
-              <p className="text-xl font-bold text-gray-900">{stats.averageRating.toFixed(1)}</p>
+            <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white">
+              <UserX className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">₦{stats.totalRevenue.toLocaleString()}</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white">
+              <DollarSign className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Avg Rating</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.averageRating.toFixed(1)}</p>
+            </div>
+            <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white">
+              <Star className="w-6 h-6" />
             </div>
           </div>
         </div>
