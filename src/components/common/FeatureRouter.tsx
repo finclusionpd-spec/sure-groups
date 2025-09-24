@@ -2,6 +2,8 @@ import React from 'react';
 import { UserManagement } from '../features/UserManagement';
 import { KYCManagement } from '../features/KYCManagement';
 import { WalletManagement } from '../features/WalletManagement';
+import { ChatManagement } from '../features/ChatManagement';
+import { WalletManagementAdmin } from '../features/WalletManagementAdmin';
 import { TicketingSystem } from '../features/TicketingSystem';
 import { GroupManagement } from '../features/GroupManagement';
 import { EventManagement } from '../features/EventManagement';
@@ -194,9 +196,9 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'vendors-management':
       return <VendorManagement />;
     case 'chat-management':
-      return <ChatMessaging />;
+      return <ChatManagement />;
     case 'wallet-management':
-      return <WalletManagement />;
+      return <WalletManagementAdmin />;
     case 'marketplace-management':
       return <MarketplaceManagement />;
     case 'calendar-management':
