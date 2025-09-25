@@ -280,6 +280,41 @@ export const PlatformOverview: React.FC = () => {
         ))}
       </div>
 
+      {/* Quick Actions */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button 
+            onClick={() => window.location.href = '/product-admin/members-management'}
+            className="flex items-center justify-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+          >
+            <Users className="w-6 h-6 text-blue-600 mr-3" />
+            <span className="font-medium text-blue-900">Manage Users</span>
+          </button>
+          <button 
+            onClick={() => window.location.href = '/product-admin/security-management'}
+            className="flex items-center justify-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+          >
+            <Shield className="w-6 h-6 text-green-600 mr-3" />
+            <span className="font-medium text-green-900">Security Settings</span>
+          </button>
+          <button 
+            onClick={() => window.location.href = '/product-admin/analytics-reports'}
+            className="flex items-center justify-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+          >
+            <BarChart3 className="w-6 h-6 text-purple-600 mr-3" />
+            <span className="font-medium text-purple-900">View Analytics</span>
+          </button>
+          <button 
+            onClick={() => window.location.href = '/product-admin/system-settings'}
+            className="flex items-center justify-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+          >
+            <Settings className="w-6 h-6 text-orange-600 mr-3" />
+            <span className="font-medium text-orange-900">System Settings</span>
+          </button>
+        </div>
+      </div>
+
       {/* Feature Management and System Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Feature Rollout Status */}
@@ -331,28 +366,6 @@ export const PlatformOverview: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="flex items-center justify-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <Users className="w-6 h-6 text-blue-600 mr-3" />
-            <span className="font-medium text-blue-900">Manage Users</span>
-          </button>
-          <button className="flex items-center justify-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-            <Shield className="w-6 h-6 text-green-600 mr-3" />
-            <span className="font-medium text-green-900">Security Settings</span>
-          </button>
-          <button className="flex items-center justify-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-            <BarChart3 className="w-6 h-6 text-purple-600 mr-3" />
-            <span className="font-medium text-purple-900">View Analytics</span>
-          </button>
-          <button className="flex items-center justify-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
-            <Settings className="w-6 h-6 text-orange-600 mr-3" />
-            <span className="font-medium text-orange-900">System Settings</span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
