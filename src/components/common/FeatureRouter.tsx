@@ -6,6 +6,7 @@ import { ChatManagement } from '../features/ChatManagement';
 import { WalletManagementAdmin } from '../features/WalletManagementAdmin';
 import { MarketplaceManagementAdmin } from '../features/MarketplaceManagementAdmin';
 import { CalendarManagementAdmin } from '../features/CalendarManagementAdmin';
+import { PlatformOverview } from '../features/PlatformOverview';
 import { TicketingSystem } from '../features/TicketingSystem';
 import { GroupManagement } from '../features/GroupManagement';
 import { EventManagement } from '../features/EventManagement';
@@ -85,6 +86,8 @@ interface FeatureRouterProps {
 export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
   const { user } = useAuth();
   switch (featureId) {
+    case 'platform-overview':
+      return <PlatformOverview />;
     case 'user-tour':
       return <UserTourGuide />;
     case 'my-groups':

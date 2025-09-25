@@ -447,7 +447,7 @@ export const AnalyticsReports: React.FC = () => {
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {metrics.map((metric, index) => (
-              <div key={index} className="bg-white rounded-lg border border-gray-200 p-6">
+              <div key={index} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">{metric.title}</p>

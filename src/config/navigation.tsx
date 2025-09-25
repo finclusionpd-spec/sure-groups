@@ -147,6 +147,12 @@ export const getGroupAdminNavigation = (): NavigationGroup[] => [
 
 export const getProductAdminNavigation = (): NavigationGroup[] => [
   {
+    title: 'Dashboard & Overview',
+    items: [
+      { id: 'platform-overview', label: 'Platform Overview', icon: BarChart3 }
+    ]
+  },
+  {
     title: 'Platform Management',
     items: [
       { id: 'group-admin-management', label: 'Group Admin Management', icon: Users },

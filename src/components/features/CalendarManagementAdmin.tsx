@@ -336,7 +336,7 @@ export const CalendarManagementAdmin: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Events</p>
@@ -347,7 +347,7 @@ export const CalendarManagementAdmin: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Upcoming Events</p>
@@ -358,7 +358,7 @@ export const CalendarManagementAdmin: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Past Events</p>
@@ -369,7 +369,7 @@ export const CalendarManagementAdmin: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Cancelled Events</p>
@@ -636,7 +636,7 @@ export const CalendarManagementAdmin: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
           <div className="h-96 flex items-center justify-center bg-gray-50 rounded-lg">
             <div className="text-center">
               <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
