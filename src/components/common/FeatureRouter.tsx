@@ -4,6 +4,8 @@ import { KYCManagement } from '../features/KYCManagement';
 import { WalletManagement } from '../features/WalletManagement';
 import { ChatManagement } from '../features/ChatManagement';
 import { WalletManagementAdmin } from '../features/WalletManagementAdmin';
+import { MarketplaceManagementAdmin } from '../features/MarketplaceManagementAdmin';
+import { CalendarManagementAdmin } from '../features/CalendarManagementAdmin';
 import { TicketingSystem } from '../features/TicketingSystem';
 import { GroupManagement } from '../features/GroupManagement';
 import { EventManagement } from '../features/EventManagement';
@@ -200,9 +202,9 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'wallet-management':
       return <WalletManagementAdmin />;
     case 'marketplace-management':
-      return <MarketplaceManagement />;
+      return <MarketplaceManagementAdmin />;
     case 'calendar-management':
-      return <EventManagement />;
+      return <CalendarManagementAdmin />;
     case 'system-settings':
       return <SystemSettings />;
     case 'security-management':
