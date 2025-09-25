@@ -81,13 +81,14 @@ import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
   featureId: string;
+  onNavigate?: (featureId: string) => void;
 }
 
-export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
+export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavigate }) => {
   const { user } = useAuth();
   switch (featureId) {
     case 'platform-overview':
-      return <PlatformOverview />;
+      return <PlatformOverview onNavigate={onNavigate} />;
     case 'user-tour':
       return <UserTourGuide />;
     case 'my-groups':
