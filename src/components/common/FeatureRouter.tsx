@@ -77,6 +77,19 @@ import { VendorWallet } from '../features/VendorWallet';
 import { AssociationRegistrationPage } from '../features/AssociationRegistration';
 import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
 import { AnalyticsReports } from '../features/AnalyticsReports';
+import { DashboardManagement } from '../features/DashboardManagement';
+import { BulkHistoricalDataManagement } from '../features/BulkHistoricalDataManagement';
+import { BackgroundCheckManagement } from '../features/BackgroundCheckManagement';
+import { EscrowManagement } from '../features/EscrowManagement';
+import { SubscriptionFeeManagement } from '../features/SubscriptionFeeManagement';
+import { ThirdPartyIntegrationManagement } from '../features/ThirdPartyIntegrationManagement';
+import { APIIntegrationManagement } from '../features/APIIntegrationManagement';
+import { DeveloperToolsSandboxManagement } from '../features/DeveloperToolsSandboxManagement';
+import { EmailTemplateManagement } from '../features/EmailTemplateManagement';
+import { SystemHealthCheck } from '../features/SystemHealthCheck';
+import { SystemLogConfiguration } from '../features/SystemLogConfiguration';
+import { ReportAnalyticsManagement } from '../features/ReportAnalyticsManagement';
+import { WhiteLabelingCustomization } from '../features/WhiteLabelingCustomization';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
@@ -269,6 +282,45 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
       return <AssociationRegistrationManagement />;
     case 'analytics-reports':
       return <AnalyticsReports />;
+    
+    // Super Admin Features - User & Access Control
+    case 'dashboard-management':
+      return <DashboardManagement />;
+    case 'bulk-historical-data':
+      return <BulkHistoricalDataManagement />;
+    case 'background-check':
+      return <BackgroundCheckManagement />;
+    
+    // Super Admin Features - Finance & Transactions
+    case 'escrow-management':
+      return <EscrowManagement />;
+    case 'subscription-fee':
+      return <SubscriptionFeeManagement />;
+    
+    // Super Admin Features - Integrations & Developer Tools
+    case 'third-party-integration':
+      return <ThirdPartyIntegrationManagement />;
+    case 'api-integration':
+      return <APIIntegrationManagement />;
+    case 'developer-tools':
+      return <DeveloperToolsSandboxManagement />;
+    
+    // Super Admin Features - Marketplace & Engagement
+    case 'email-template':
+      return <EmailTemplateManagement />;
+    
+    // Super Admin Features - System & Data
+    case 'system-health':
+      return <SystemHealthCheck />;
+    case 'system-log':
+      return <SystemLogConfiguration />;
+    case 'report-analytics':
+      return <ReportAnalyticsManagement />;
+    
+    // Super Admin Features - Support & Customization
+    case 'white-labeling':
+      return <WhiteLabelingCustomization />;
+    
     default:
       return (
         <div className="p-6">
