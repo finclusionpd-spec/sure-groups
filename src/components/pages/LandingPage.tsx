@@ -8,22 +8,20 @@ import {
   Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SureGroupsLogo } from '../common/SureGroupsLogo';
 
 export const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-brand-dark border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">SureGroups</span>
-            </div>
+            <Link to="/" className="flex items-center">
+              <SureGroupsLogo size="lg" showText={true} />
+            </Link>
             <div className="flex items-center space-x-4">
-              <Link to="/demo" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-teal-600 transition-all duration-200 font-medium">
+              <Link to="/demo" className="btn-primary">
                 Try Demo
               </Link>
             </div>
@@ -34,99 +32,49 @@ export const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <section className="bg-gray-50 py-20 lg:py-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-brand-bold text-brand-dark mb-8 leading-tight">
             Digital Platform for Organized Groups
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-brand-body mb-12 max-w-4xl mx-auto leading-relaxed">
             Unite your church, union, association, or community with powerful group management tools, integrated messaging, exclusive marketplace benefits, and professional-grade administration features.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/demo" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-teal-600 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <Link to="/demo" className="btn-primary px-8 py-4 text-lg shadow-lg hover:shadow-xl">
               Explore Demo Platform
             </Link>
-            <button className="bg-white text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+            <button className="btn-secondary px-8 py-4 text-lg shadow-sm hover:shadow-md">
               Schedule Demo Call
             </button>
           </div>
 
-          {/* Role Selection Cards */}
+          {/* Community Image Section */}
           <div className="mt-16 max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
-              {/* Product Admin */}
-              <Link to="/signup?role=product-admin" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                    <Building className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Product Admin</h3>
-                  <p className="text-sm text-gray-600 mb-4">Platform management and oversight</p>
-                </div>
-              </Link>
-
-              {/* Group Admin */}
-              <Link to="/signup?role=group-admin" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                    <Users className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Group Admin</h3>
-                  <p className="text-sm text-gray-600 mb-4">Group management and member oversight</p>
-                </div>
-              </Link>
-
-              {/* Member */}
-              <Link to="/signup?role=member" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                    <Users className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Member</h3>
-                  <p className="text-sm text-gray-600 mb-4">Community participation and engagement</p>
-                </div>
-              </Link>
-
-              {/* Super Admin */}
-              <Link to="/signup?role=super-admin" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                    <Shield className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Super Admin</h3>
-                  <p className="text-sm text-gray-600 mb-4">System-wide management and control</p>
-                </div>
-              </Link>
-
-              {/* Vendor */}
-              <Link to="/signup?role=vendor" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                    <ShoppingCart className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Vendor</h3>
-                  <p className="text-sm text-gray-600 mb-4">Service provider and marketplace seller</p>
-                </div>
-              </Link>
-
-              {/* Developer */}
-              <Link to="/signup?role=developer" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                    <Settings className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Developer</h3>
-                  <p className="text-sm text-gray-600 mb-4">API access and platform integration</p>
-                </div>
-              </Link>
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+              <img
+                src="/Groupimage.jpeg"
+                alt="Vibrant community gathering of women in traditional African attire, representing the diverse and engaged community that SureGroups serves"
+                className="w-full h-auto object-cover"
+                style={{ aspectRatio: '16/9' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              <div className="absolute bottom-6 left-6 right-6">
+                <h3 className="text-2xl md:text-3xl font-brand-bold text-white mb-2">
+                  Building Stronger Communities Together
+                </h3>
+                <p className="text-white/90 text-lg font-brand-regular">
+                  Join thousands of organizations creating meaningful connections and driving positive change
+                </p>
+              </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-center space-x-4">
-              <button className="bg-gradient-to-r from-blue-500 to-teal-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-teal-600 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <div className="flex justify-center space-x-4 mt-12">
+              <Link to="/signup" className="btn-primary px-8 py-3 text-lg shadow-lg hover:shadow-xl">
                 Get Started
-              </button>
-              <Link to="/login" className="bg-white text-gray-700 px-8 py-3 rounded-lg text-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                Sign In
+              </Link>
+              <Link to="/login" className="btn-secondary px-8 py-3 text-lg shadow-sm hover:shadow-md">
+                Login
               </Link>
             </div>
           </div>
@@ -137,38 +85,38 @@ export const LandingPage: React.FC = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Core Features</h2>
-            <p className="text-lg text-gray-600">Everything you need to manage your organization effectively</p>
+            <h2 className="text-3xl font-brand-bold text-brand-dark mb-4">Core Features</h2>
+            <p className="text-lg text-brand-body">Everything you need to manage your organization effectively</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center p-6 rounded-xl bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="card-brand text-center hover:shadow-lg transition-all duration-200">
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Messaging</h3>
-              <p className="text-gray-600 text-sm">Seamless communication tools for your community</p>
+              <h3 className="text-lg font-brand-bold text-brand-dark mb-2">Messaging</h3>
+              <p className="text-brand-body text-sm">Seamless communication tools for your community</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="card-brand text-center hover:shadow-lg transition-all duration-200">
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mx-auto mb-4">
                 <ShoppingCart className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Marketplace</h3>
-              <p className="text-gray-600 text-sm">Built-in marketplace for community commerce</p>
+              <h3 className="text-lg font-brand-bold text-brand-dark mb-2">Marketplace</h3>
+              <p className="text-brand-body text-sm">Built-in marketplace for community commerce</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="card-brand text-center hover:shadow-lg transition-all duration-200">
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Group Management</h3>
-              <p className="text-gray-600 text-sm">Comprehensive tools for organizing and managing groups</p>
+              <h3 className="text-lg font-brand-bold text-brand-dark mb-2">Group Management</h3>
+              <p className="text-brand-body text-sm">Comprehensive tools for organizing and managing groups</p>
             </div>
-            <div className="text-center p-6 rounded-xl bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="card-brand text-center hover:shadow-lg transition-all duration-200">
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Settings className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Administration</h3>
-              <p className="text-gray-600 text-sm">Powerful admin tools for complete control</p>
+              <h3 className="text-lg font-brand-bold text-brand-dark mb-2">Administration</h3>
+              <p className="text-brand-body text-sm">Powerful admin tools for complete control</p>
             </div>
           </div>
         </div>
@@ -218,7 +166,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-lg font-bold">SureGroups</span>
+                <span className="text-lg font-bold text-white">SureGroups</span>
               </div>
               <p className="text-gray-400">
                 Empowering organizations with comprehensive group management solutions.
