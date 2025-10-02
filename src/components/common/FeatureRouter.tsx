@@ -2,6 +2,11 @@ import React from 'react';
 import { UserManagement } from '../features/UserManagement';
 import { KYCManagement } from '../features/KYCManagement';
 import { WalletManagement } from '../features/WalletManagement';
+import { ChatManagement } from '../features/ChatManagement';
+import { WalletManagementAdmin } from '../features/WalletManagementAdmin';
+import { MarketplaceManagementAdmin } from '../features/MarketplaceManagementAdmin';
+import { CalendarManagementAdmin } from '../features/CalendarManagementAdmin';
+import { PlatformOverview } from '../features/PlatformOverview';
 import { TicketingSystem } from '../features/TicketingSystem';
 import { GroupManagement } from '../features/GroupManagement';
 import { EventManagement } from '../features/EventManagement';
@@ -34,6 +39,7 @@ import { BenefitManagement } from '../features/BenefitManagement';
 import { MarketplaceManagement } from '../features/MarketplaceManagement';
 import { VendorTourGuide } from '../features/VendorTourGuide';
 import { VendorServices } from '../features/VendorServices';
+import { VendorManagement } from '../features/VendorManagement';
 import { VendorOrders } from '../features/VendorOrders';
 import { VendorTransactions } from '../features/VendorTransactions';
 import { VendorMarketing } from '../features/VendorMarketing';
@@ -70,15 +76,32 @@ import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
 import { VendorWallet } from '../features/VendorWallet';
 import { AssociationRegistrationPage } from '../features/AssociationRegistration';
 import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
+import { AnalyticsReports } from '../features/AnalyticsReports';
+import { DashboardManagement } from '../features/DashboardManagement';
+import { BulkHistoricalDataManagement } from '../features/BulkHistoricalDataManagement';
+import { BackgroundCheckManagement } from '../features/BackgroundCheckManagement';
+import { EscrowManagement } from '../features/EscrowManagement';
+import { SubscriptionFeeManagement } from '../features/SubscriptionFeeManagement';
+import { ThirdPartyIntegrationManagement } from '../features/ThirdPartyIntegrationManagement';
+import { APIIntegrationManagement } from '../features/APIIntegrationManagement';
+import { DeveloperToolsSandboxManagement } from '../features/DeveloperToolsSandboxManagement';
+import { EmailTemplateManagement } from '../features/EmailTemplateManagement';
+import { SystemHealthCheck } from '../features/SystemHealthCheck';
+import { SystemLogConfiguration } from '../features/SystemLogConfiguration';
+import { ReportAnalyticsManagement } from '../features/ReportAnalyticsManagement';
+import { WhiteLabelingCustomization } from '../features/WhiteLabelingCustomization';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
   featureId: string;
+  onNavigate?: (featureId: string) => void;
 }
 
-export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
+export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavigate }) => {
   const { user } = useAuth();
   switch (featureId) {
+    case 'platform-overview':
+      return <PlatformOverview onNavigate={onNavigate} />;
     case 'user-tour':
       return <UserTourGuide />;
     case 'my-groups':
@@ -190,15 +213,15 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'members-management':
       return <UserManagement />;
     case 'vendors-management':
-      return <VendorServices />;
+      return <VendorManagement />;
     case 'chat-management':
-      return <ChatMessaging />;
+      return <ChatManagement />;
     case 'wallet-management':
-      return <WalletManagement />;
+      return <WalletManagementAdmin />;
     case 'marketplace-management':
-      return <MarketplaceManagement />;
+      return <MarketplaceManagementAdmin />;
     case 'calendar-management':
-      return <EventManagement />;
+      return <CalendarManagementAdmin />;
     case 'system-settings':
       return <SystemSettings />;
     case 'security-management':
@@ -257,6 +280,47 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <AssociationRegistrationPage />;
     case 'association-registration-management':
       return <AssociationRegistrationManagement />;
+    case 'analytics-reports':
+      return <AnalyticsReports />;
+    
+    // Super Admin Features - User & Access Control
+    case 'dashboard-management':
+      return <DashboardManagement />;
+    case 'bulk-historical-data':
+      return <BulkHistoricalDataManagement />;
+    case 'background-check':
+      return <BackgroundCheckManagement />;
+    
+    // Super Admin Features - Finance & Transactions
+    case 'escrow-management':
+      return <EscrowManagement />;
+    case 'subscription-fee':
+      return <SubscriptionFeeManagement />;
+    
+    // Super Admin Features - Integrations & Developer Tools
+    case 'third-party-integration':
+      return <ThirdPartyIntegrationManagement />;
+    case 'api-integration':
+      return <APIIntegrationManagement />;
+    case 'developer-tools':
+      return <DeveloperToolsSandboxManagement />;
+    
+    // Super Admin Features - Marketplace & Engagement
+    case 'email-template':
+      return <EmailTemplateManagement />;
+    
+    // Super Admin Features - System & Data
+    case 'system-health':
+      return <SystemHealthCheck />;
+    case 'system-log':
+      return <SystemLogConfiguration />;
+    case 'report-analytics':
+      return <ReportAnalyticsManagement />;
+    
+    // Super Admin Features - Support & Customization
+    case 'white-labeling':
+      return <WhiteLabelingCustomization />;
+    
     default:
       return (
         <div className="p-6">

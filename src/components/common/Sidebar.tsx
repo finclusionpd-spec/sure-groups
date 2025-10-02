@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SidebarGroup } from '../../types';
 import { Link } from 'react-router-dom';
@@ -13,9 +13,20 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect, activeFeature }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const { user, isDemoMode } = useAuth();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  const toggleGroup = (groupIndex: number) => {
+    const newExpanded = new Set(expandedGroups);
+    if (newExpanded.has(groupIndex)) {
+      newExpanded.delete(groupIndex);
+    } else {
+      newExpanded.add(groupIndex);
+    }
+    setExpandedGroups(newExpanded);
+  };
 
   const handleItemClick = (itemId: string) => {
     if (onFeatureSelect) {
@@ -80,31 +91,46 @@ export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect,
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4">
-            {groups.map((group, groupIndex) => (
-              <div key={groupIndex} className="mb-6">
-                <h3 className="px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                  {group.title}
-                </h3>
-                <div className="space-y-1">
-                  {group.items.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleItemClick(item.id)}
-                      className={`
-                        w-full flex items-center space-x-3 px-6 py-2 text-sm transition-colors
-                        ${item.active || activeFeature === item.id
-                          ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
-                          : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                        }
-                      `}
-                    >
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
+            {groups.map((group, groupIndex) => {
+              const isExpanded = expandedGroups.has(groupIndex);
+              return (
+                <div key={groupIndex} className="mb-4">
+                  <button
+                    onClick={() => toggleGroup(groupIndex)}
+                    className="w-full flex items-center justify-between px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      {group.title}
+                    </span>
+                    {isExpanded ? (
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                    )}
+                  </button>
+                  {isExpanded && (
+                    <div className="space-y-1">
+                      {group.items.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleItemClick(item.id)}
+                          className={`
+                            w-full flex items-center space-x-3 px-6 py-2 text-sm transition-colors
+                            ${item.active || activeFeature === item.id
+                              ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                            }
+                          `}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </nav>
 
           {/* Logout Button */}
