@@ -3,6 +3,7 @@ import { Menu, X, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SidebarGroup } from '../../types';
 import { Link } from 'react-router-dom';
+import { SureGroupsLogo } from './SureGroupsLogo';
 
 interface SidebarProps {
   groups: SidebarGroup[];
@@ -66,11 +67,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect,
           {/* Logo section */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             {logo || (
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">SG</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900">Sure Groups</span>
+              <Link to="/">
+                <SureGroupsLogo size="md" showText={true} />
               </Link>
             )}
             <button
