@@ -12,10 +12,10 @@ export const SureGroupsLogo: React.FC<SureGroupsLogoProps> = ({
   className = '' 
 }) => {
   const sizeClasses = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16'
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-20 h-20'
   };
 
   const textSizeClasses = {
@@ -26,19 +26,24 @@ export const SureGroupsLogo: React.FC<SureGroupsLogoProps> = ({
   };
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div className={`flex items-center space-x-3 ${className}`}>
       {/* Shield Logo */}
       <div className={`${sizeClasses[size]} relative`}>
-      <img
-                src="/logo.jpeg"
-                alt="Vibrant community gathering of women in traditional African attire, representing the diverse and engaged community that SureGroups serves"
-                className="w-[50px] aspect-square h-10 "
-                
-              />
+        <img
+          src="/logo.jpeg"
+          alt="Sure Groups Logo"
+          className={`${sizeClasses[size]} object-contain`}
+        />
       </div>
 
       {/* Text */}
-      
+      {showText && (
+        <div className="flex flex-col">
+          <span className={`font-bold text-brand-dark ${textSizeClasses[size]}`}>
+            Sure Groups
+          </span>
+        </div>
+      )}
     </div>
   );
 };

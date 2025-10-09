@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff, ArrowLeft, Users, Mail, Phone, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Mail, Phone, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { SureGroupsLogo } from '../common/SureGroupsLogo';
@@ -49,7 +49,18 @@ export const LoginForm: React.FC = () => {
       console.log('Login result:', success);
       
       if (success) {
-        navigate('/dashboard');
+        // Get user role from auth context to determine redirect
+        const userData = localStorage.getItem('sure-groups-user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          if (user.role === 'super-admin') {
+            navigate('/superadmin/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setError(`Invalid ${loginMethod} or password.`);
       }

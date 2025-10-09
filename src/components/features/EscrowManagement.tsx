@@ -1,74 +1,68 @@
 import React, { useState } from 'react';
 import { 
-  Lock, 
+  Shield, 
   DollarSign, 
   Clock, 
   CheckCircle, 
-  AlertTriangle,
-  Search,
+  AlertTriangle, 
+  Eye, 
+  Search, 
   Filter,
-  Eye,
-  FileText,
-  Download,
-  Settings,
-  Shield,
-  XCircle
+  Plus,
+  TrendingUp,
+  Users,
+  FileText
 } from 'lucide-react';
 
 export const EscrowManagement: React.FC = () => {
-  const [escrowAccounts, setEscrowAccounts] = useState([
+  const [escrows, setEscrows] = useState([
     {
-      id: 1,
-      accountId: 'ESC001',
-      buyerName: 'John Doe',
-      sellerName: 'Jane Smith',
+      id: '1',
+      transactionId: 'TXN-001',
       amount: 2500.00,
       currency: 'USD',
       status: 'Active',
-      type: 'Service Payment',
-      createdAt: '2024-01-10',
-      releaseDate: '2024-01-25',
-      description: 'Website development project payment'
+      buyer: 'John Smith',
+      seller: 'Sarah Johnson',
+      createdAt: '2024-01-15 10:30:00',
+      expiresAt: '2024-01-22 10:30:00',
+      description: 'Website development project'
     },
     {
-      id: 2,
-      accountId: 'ESC002',
-      buyerName: 'Mike Johnson',
-      sellerName: 'Sarah Wilson',
+      id: '2',
+      transactionId: 'TXN-002',
       amount: 1200.00,
       currency: 'USD',
       status: 'Released',
-      type: 'Product Sale',
-      createdAt: '2024-01-08',
-      releaseDate: '2024-01-15',
-      description: 'Electronics purchase'
+      buyer: 'Mike Wilson',
+      seller: 'Lisa Brown',
+      createdAt: '2024-01-14 14:20:00',
+      expiresAt: '2024-01-21 14:20:00',
+      description: 'Logo design service'
     },
     {
-      id: 3,
-      accountId: 'ESC003',
-      buyerName: 'Alice Brown',
-      sellerName: 'Bob Davis',
+      id: '3',
+      transactionId: 'TXN-003',
       amount: 5000.00,
       currency: 'USD',
       status: 'Disputed',
-      type: 'Service Payment',
-      createdAt: '2024-01-12',
-      releaseDate: '2024-01-27',
-      description: 'Consulting services'
+      buyer: 'David Lee',
+      seller: 'Emma Davis',
+      createdAt: '2024-01-13 09:15:00',
+      expiresAt: '2024-01-20 09:15:00',
+      description: 'Mobile app development'
     }
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [filterType, setFilterType] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
 
-  const filteredAccounts = escrowAccounts.filter(account => {
-    const matchesSearch = account.accountId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.buyerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.sellerName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'All' || account.status === filterStatus;
-    const matchesType = filterType === 'All' || account.type === filterType;
-    return matchesSearch && matchesStatus && matchesType;
+  const filteredEscrows = escrows.filter(escrow => {
+    const matchesSearch = escrow.transactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         escrow.buyer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         escrow.seller.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || escrow.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
   const getStatusColor = (status: string) => {
@@ -76,151 +70,196 @@ export const EscrowManagement: React.FC = () => {
       case 'Active': return 'bg-blue-100 text-blue-800';
       case 'Released': return 'bg-green-100 text-green-800';
       case 'Disputed': return 'bg-red-100 text-red-800';
-      case 'Cancelled': return 'bg-gray-100 text-gray-800';
+      case 'Expired': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Active': return <Clock className="w-4 h-4" />;
-      case 'Released': return <CheckCircle className="w-4 h-4" />;
-      case 'Disputed': return <AlertTriangle className="w-4 h-4" />;
-      case 'Cancelled': return <XCircle className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
-    }
+  const stats = {
+    total: escrows.length,
+    active: escrows.filter(e => e.status === 'Active').length,
+    released: escrows.filter(e => e.status === 'Released').length,
+    disputed: escrows.filter(e => e.status === 'Disputed').length,
+    totalAmount: escrows.reduce((sum, e) => sum + e.amount, 0)
   };
 
-  const totalEscrowValue = escrowAccounts
-    .filter(account => account.status === 'Active')
-    .reduce((sum, account) => sum + account.amount, 0);
-
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Escrow Management</h1>
-        <p className="text-gray-600">Manage escrow accounts and secure payment transactions</p>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+              Escrow Management System
+            </h1>
+            <p className="text-gray-600" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+              Manage secure payment escrow transactions
+            </p>
+          </div>
+          <button className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg">
+            <Plus className="w-5 h-5" />
+            <span style={{ fontFamily: 'Molde Semi Expanded Bold' }}>New Escrow</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-[#098DCF] bg-opacity-10 rounded-xl">
+              <Shield className="w-6 h-6 text-[#098DCF]" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Total Escrows
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.total}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-blue-100 rounded-xl">
+              <Clock className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Active
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.active}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-xl">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Released
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.released}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <DollarSign className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Total Amount
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                ${stats.totalAmount.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Controls */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <div className="flex flex-col lg:flex-row gap-4 mb-4">
+      <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 mb-6">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search by account ID, buyer, or seller..."
+                placeholder="Search escrows..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#098DCF] focus:border-transparent"
+                style={{ fontFamily: 'Molde Semi Expanded Regular' }}
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#098DCF] focus:border-transparent"
+              style={{ fontFamily: 'Molde Semi Expanded Regular' }}
             >
               <option value="All">All Status</option>
               <option value="Active">Active</option>
               <option value="Released">Released</option>
               <option value="Disputed">Disputed</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="Expired">Expired</option>
             </select>
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="All">All Types</option>
-              <option value="Service Payment">Service Payment</option>
-              <option value="Product Sale">Product Sale</option>
-              <option value="Rental Payment">Rental Payment</option>
-              <option value="Subscription">Subscription</option>
-            </select>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Lock className="w-4 h-4" />
-              New Escrow
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Escrow Accounts List */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
+      {/* Escrows Table */}
+      <div className="bg-white rounded-2xl border border-[#E8EEF7] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Account
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Transaction
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Parties
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Release Date
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAccounts.map((account) => (
-                <tr key={account.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+              {filteredEscrows.map((escrow) => (
+                <tr key={escrow.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{account.accountId}</div>
-                      <div className="text-xs text-gray-500">Created: {account.createdAt}</div>
+                      <div className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                        {escrow.transactionId}
+                      </div>
+                      <div className="text-sm text-gray-500">{escrow.description}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm text-gray-900">Buyer: {account.buyerName}</div>
-                      <div className="text-sm text-gray-500">Seller: {account.sellerName}</div>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">
+                      <div>Buyer: {escrow.buyer}</div>
+                      <div>Seller: {escrow.seller}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">
-                      ${account.amount.toLocaleString()} {account.currency}
+                      ${escrow.amount.toLocaleString()} {escrow.currency}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {account.type}
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(escrow.status)}`}>
+                      {escrow.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(account.status)}`}>
-                      {getStatusIcon(account.status)}
-                      {account.status}
-                    </span>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {escrow.createdAt}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {account.releaseDate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="text-blue-600 hover:text-blue-900 p-1">
+                      <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors">
                         <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="text-gray-600 hover:text-gray-900 p-1">
-                        <FileText className="w-4 h-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900 p-1">
-                        <Settings className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -228,79 +267,6 @@ export const EscrowManagement: React.FC = () => {
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      {/* Disputed Accounts */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Disputed Accounts</h3>
-        <div className="space-y-3">
-          {escrowAccounts.filter(account => account.status === 'Disputed').map((account) => (
-            <div key={account.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{account.accountId} - {account.description}</p>
-                  <p className="text-xs text-gray-500">${account.amount.toLocaleString()} • {account.buyerName} vs {account.sellerName}</p>
-                </div>
-              </div>
-              <button className="text-red-600 hover:text-red-800 text-sm font-medium">
-                Resolve Dispute
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Lock className="w-6 h-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Accounts</p>
-              <p className="text-2xl font-bold text-gray-900">{escrowAccounts.length}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Value</p>
-              <p className="text-2xl font-bold text-gray-900">${totalEscrowValue.toLocaleString()}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="w-6 h-6 text-yellow-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Active</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {escrowAccounts.filter(a => a.status === 'Active').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Disputed</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {escrowAccounts.filter(a => a.status === 'Disputed').length}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

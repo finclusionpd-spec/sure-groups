@@ -3,348 +3,284 @@ import {
   Palette, 
   Settings, 
   Eye, 
+  Edit, 
   Save, 
-  Upload, 
-  Download, 
-  Trash2, 
-  Plus,
-  Search,
-  Filter,
+  Upload,
+  Download,
+  RefreshCw,
   CheckCircle,
-  Clock,
-  AlertTriangle,
-  Image,
-  Type,
-  Layout,
-  Circle
+  AlertTriangle
 } from 'lucide-react';
 
 export const WhiteLabelingCustomization: React.FC = () => {
   const [customizations, setCustomizations] = useState([
     {
-      id: 1,
-      name: 'Corporate Branding',
-      client: 'Acme Corporation',
+      id: '1',
+      name: 'Primary Brand Colors',
+      type: 'Colors',
       status: 'Active',
-      lastModified: '2024-01-15 14:30',
-      createdBy: 'Super Admin',
-      logo: 'acme-logo.png',
-      primaryColor: '#1E40AF',
-      secondaryColor: '#3B82F6',
-      fontFamily: 'Inter',
-      customDomain: 'acme.suregroups.com'
+      lastModified: '2024-01-15 14:30:00',
+      description: 'Main brand color scheme'
     },
     {
-      id: 2,
-      name: 'Non-Profit Theme',
-      client: 'Green Earth Foundation',
-      status: 'Draft',
-      lastModified: '2024-01-14 10:15',
-      createdBy: 'Super Admin',
-      logo: 'green-earth-logo.png',
-      primaryColor: '#059669',
-      secondaryColor: '#10B981',
-      fontFamily: 'Roboto',
-      customDomain: 'greenearth.suregroups.com'
-    },
-    {
-      id: 3,
-      name: 'Educational Platform',
-      client: 'Tech University',
+      id: '2',
+      name: 'Logo Configuration',
+      type: 'Assets',
       status: 'Active',
-      lastModified: '2024-01-13 16:45',
-      createdBy: 'Super Admin',
-      logo: 'tech-uni-logo.png',
-      primaryColor: '#7C3AED',
-      secondaryColor: '#8B5CF6',
-      fontFamily: 'Open Sans',
-      customDomain: 'techuniversity.suregroups.com'
+      lastModified: '2024-01-14 12:00:00',
+      description: 'Company logo and branding'
     },
     {
-      id: 4,
-      name: 'Healthcare Portal',
-      client: 'MediCare Plus',
-      status: 'Inactive',
-      lastModified: '2024-01-12 09:20',
-      createdBy: 'Super Admin',
-      logo: 'medicare-logo.png',
-      primaryColor: '#DC2626',
-      secondaryColor: '#EF4444',
-      fontFamily: 'Lato',
-      customDomain: 'medicare.suregroups.com'
+      id: '3',
+      name: 'Custom Domain',
+      type: 'Domain',
+      status: 'Pending',
+      lastModified: '2024-01-13 09:15:00',
+      description: 'Custom domain configuration'
     }
   ]);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [activeTab, setActiveTab] = useState('customizations');
-
-  const filteredCustomizations = customizations.filter(customization => {
-    const matchesSearch = customization.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customization.client.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'All' || customization.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const [activeTab, setActiveTab] = useState('colors');
+  const [isSaving, setIsSaving] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Active': return 'bg-green-100 text-green-800';
-      case 'Draft': return 'bg-yellow-100 text-yellow-800';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800';
       case 'Inactive': return 'bg-gray-100 text-gray-800';
-      case 'Archived': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Active': return <CheckCircle className="w-4 h-4" />;
-      case 'Draft': return <Clock className="w-4 h-4" />;
-      case 'Inactive': return <AlertTriangle className="w-4 h-4" />;
-      case 'Archived': return <AlertTriangle className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
-    }
+  const stats = {
+    total: customizations.length,
+    active: customizations.filter(c => c.status === 'Active').length,
+    pending: customizations.filter(c => c.status === 'Pending').length,
+    types: [...new Set(customizations.map(c => c.type))].length
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    // Simulate save
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsSaving(false);
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">White Labelling & Platform Customization Management</h1>
-        <p className="text-gray-600">Manage white-label customizations and platform branding for clients</p>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+              White Labeling & Customization
+            </h1>
+            <p className="text-gray-600" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+              Customize platform branding and appearance
+            </p>
+          </div>
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg disabled:opacity-50"
+          >
+            {isSaving ? (
+              <RefreshCw className="w-5 h-5 animate-spin" />
+            ) : (
+              <Save className="w-5 h-5" />
+            )}
+            <span style={{ fontFamily: 'Molde Semi Expanded Bold' }}>Save Changes</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-[#098DCF] bg-opacity-10 rounded-xl">
+              <Palette className="w-6 h-6 text-[#098DCF]" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Total Customizations
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.total}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-xl">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Active
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.active}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-yellow-100 rounded-xl">
+              <AlertTriangle className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Pending
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.pending}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <Settings className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Types
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.types}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg border border-gray-200 mb-6">
+      <div className="bg-white rounded-2xl border border-[#E8EEF7] mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6">
-            <button
-              onClick={() => setActiveTab('customizations')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'customizations'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Customizations
-            </button>
-            <button
-              onClick={() => setActiveTab('templates')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'templates'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Templates
-            </button>
-            <button
-              onClick={() => setActiveTab('assets')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'assets'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Assets
-            </button>
+            {[
+              { id: 'colors', label: 'Colors', icon: Palette },
+              { id: 'assets', label: 'Assets', icon: Upload },
+              { id: 'domain', label: 'Domain', icon: Settings },
+              { id: 'preview', label: 'Preview', icon: Eye }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-[#098DCF] text-[#098DCF]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+                style={{ fontFamily: 'Molde Semi Expanded Regular' }}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
           </nav>
         </div>
 
         <div className="p-6">
-          {/* Search and Controls */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder={`Search ${activeTab}...`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              {activeTab === 'customizations' && (
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Draft">Draft</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Archived">Archived</option>
-                </select>
-              )}
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <Plus className="w-4 h-4" />
-                New {activeTab === 'customizations' ? 'Customization' : activeTab === 'templates' ? 'Template' : 'Asset'}
-              </button>
-            </div>
-          </div>
-
-          {/* Customizations Tab */}
-          {activeTab === 'customizations' && (
-            <div className="space-y-4">
-              {filteredCustomizations.map((customization) => (
-                <div key={customization.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{customization.name}</h3>
-                      <p className="text-gray-600">{customization.client}</p>
-                      <p className="text-xs text-gray-500">By {customization.createdBy} • {customization.lastModified}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(customization.status)}`}>
-                        {getStatusIcon(customization.status)}
-                        {customization.status}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Brand Colors</h4>
-                      <div className="flex gap-2">
-                        <div 
-                          className="w-6 h-6 rounded border border-gray-300" 
-                          style={{ backgroundColor: customization.primaryColor }}
-                        ></div>
-                        <div 
-                          className="w-6 h-6 rounded border border-gray-300" 
-                          style={{ backgroundColor: customization.secondaryColor }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Typography</h4>
-                      <p className="text-sm text-gray-600">{customization.fontFamily}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Logo</h4>
-                      <p className="text-sm text-gray-600">{customization.logo}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Domain</h4>
-                      <p className="text-sm text-gray-600">{customization.customDomain}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-2">
-                    <button className="text-blue-600 hover:text-blue-900 p-2">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button className="text-gray-600 hover:text-gray-900 p-2">
-                      <Settings className="w-4 h-4" />
-                    </button>
-                    <button className="text-green-600 hover:text-green-900 p-2">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900 p-2">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+          {activeTab === 'colors' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                Brand Colors
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Primary Color</label>
+                  <div className="flex items-center space-x-3">
+                    <input type="color" defaultValue="#098DCF" className="w-12 h-10 rounded border" />
+                    <input type="text" defaultValue="#098DCF" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg" />
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-
-          {/* Templates Tab */}
-          {activeTab === 'templates' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Layout className="w-5 h-5 text-blue-600" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Secondary Color</label>
+                  <div className="flex items-center space-x-3">
+                    <input type="color" defaultValue="#0F2A75" className="w-12 h-10 rounded border" />
+                    <input type="text" defaultValue="#0F2A75" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Corporate Theme</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Professional corporate branding template with clean design</p>
-                <div className="flex gap-2">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    Use Template
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                    Preview
-                  </button>
-                </div>
-              </div>
-
-              <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Palette className="w-5 h-5 text-green-600" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Accent Color</label>
+                  <div className="flex items-center space-x-3">
+                    <input type="color" defaultValue="#E8EEF7" className="w-12 h-10 rounded border" />
+                    <input type="text" defaultValue="#E8EEF7" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Non-Profit Theme</h3>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Warm and welcoming design for non-profit organizations</p>
-                <div className="flex gap-2">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    Use Template
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                    Preview
-                  </button>
-                </div>
-              </div>
-
-              <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Type className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Educational Theme</h3>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Modern design perfect for educational institutions</p>
-                <div className="flex gap-2">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    Use Template
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                    Preview
-                  </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Assets Tab */}
           {activeTab === 'assets' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="border border-gray-200 rounded-lg p-4 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Image className="w-8 h-8 text-gray-400" />
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                Brand Assets
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Logo Upload</label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
+                    </div>
                   </div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">Logos</h4>
-                  <p className="text-xs text-gray-500">12 files</p>
                 </div>
-                
-                 <div className="border border-gray-200 rounded-lg p-4 text-center">
-                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                     <Circle className="w-8 h-8 text-gray-400" />
-                   </div>
-                   <h4 className="text-sm font-medium text-gray-900 mb-1">Color Palettes</h4>
-                   <p className="text-xs text-gray-500">8 files</p>
-                 </div>
-                
-                <div className="border border-gray-200 rounded-lg p-4 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Type className="w-8 h-8 text-gray-400" />
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Favicon Upload</label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
+                    </div>
                   </div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">Fonts</h4>
-                  <p className="text-xs text-gray-500">15 files</p>
                 </div>
-                
-                <div className="border border-gray-200 rounded-lg p-4 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Layout className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">Templates</h4>
-                  <p className="text-xs text-gray-500">6 files</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'domain' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                Custom Domain
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Domain Name</label>
+                  <input
+                    type="text"
+                    placeholder="yourcompany.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#098DCF] focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subdomain</label>
+                  <input
+                    type="text"
+                    placeholder="app"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#098DCF] focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'preview' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                Live Preview
+              </h3>
+              <div className="border border-gray-300 rounded-lg p-6 bg-white">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4"></div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Your Brand Name</h4>
+                  <p className="text-gray-600">This is how your platform will look with your custom branding</p>
                 </div>
               </div>
             </div>
@@ -352,55 +288,72 @@ export const WhiteLabelingCustomization: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Palette className="w-6 h-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Customizations</p>
-              <p className="text-2xl font-bold text-gray-900">{customizations.length}</p>
-            </div>
-          </div>
+      {/* Customizations Table */}
+      <div className="bg-white rounded-2xl border border-[#E8EEF7] overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+            Customization History
+          </h3>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Active</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {customizations.filter(c => c.status === 'Active').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="w-6 h-6 text-yellow-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Drafts</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {customizations.filter(c => c.status === 'Draft').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Settings className="w-6 h-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Templates</p>
-              <p className="text-2xl font-bold text-gray-900">12</p>
-            </div>
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Type
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Last Modified
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {customizations.map((customization) => (
+                <tr key={customization.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                        {customization.name}
+                      </div>
+                      <div className="text-sm text-gray-500">{customization.description}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {customization.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(customization.status)}`}>
+                      {customization.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {customization.lastModified}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

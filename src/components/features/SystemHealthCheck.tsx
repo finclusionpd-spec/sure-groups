@@ -1,296 +1,224 @@
 import React, { useState } from 'react';
 import { 
   Activity, 
+  Server, 
+  Database, 
+  Globe, 
   CheckCircle, 
   AlertTriangle, 
-  XCircle,
+  Clock, 
+  RefreshCw,
   TrendingUp,
-  TrendingDown,
-  Clock,
-  Database,
-  Server,
-  Globe,
   Shield,
-  Zap,
-  BarChart3,
-  RefreshCw
+  Zap
 } from 'lucide-react';
 
 export const SystemHealthCheck: React.FC = () => {
-  const [systemMetrics, setSystemMetrics] = useState({
-    overallHealth: 'Healthy',
-    uptime: '99.9%',
-    responseTime: '120ms',
-    errorRate: '0.1%',
-    activeUsers: 1247,
-    totalRequests: 2450000
-  });
-
   const [services, setServices] = useState([
     {
-      id: 1,
+      id: '1',
       name: 'Web Application',
-      status: 'Healthy',
+      status: 'Operational',
       uptime: '99.9%',
-      responseTime: '95ms',
-      lastCheck: '2024-01-15 14:30:15',
-      dependencies: ['Database', 'Redis', 'CDN']
+      responseTime: '120ms',
+      lastCheck: '2024-01-15 14:30:00'
     },
     {
-      id: 2,
-      name: 'API Gateway',
-      status: 'Healthy',
+      id: '2',
+      name: 'Database',
+      status: 'Operational',
       uptime: '99.8%',
       responseTime: '45ms',
-      lastCheck: '2024-01-15 14:30:12',
-      dependencies: ['Load Balancer', 'Authentication Service']
+      lastCheck: '2024-01-15 14:30:00'
     },
     {
-      id: 3,
-      name: 'Database',
-      status: 'Warning',
-      uptime: '99.5%',
-      responseTime: '180ms',
-      lastCheck: '2024-01-15 14:30:08',
-      dependencies: ['Storage', 'Backup Service']
+      id: '3',
+      name: 'API Gateway',
+      status: 'Degraded',
+      uptime: '98.5%',
+      responseTime: '250ms',
+      lastCheck: '2024-01-15 14:30:00'
     },
     {
-      id: 4,
-      name: 'Payment Processing',
-      status: 'Healthy',
-      uptime: '99.9%',
-      responseTime: '200ms',
-      lastCheck: '2024-01-15 14:30:10',
-      dependencies: ['Stripe API', 'Fraud Detection']
-    },
-    {
-      id: 5,
+      id: '4',
       name: 'Email Service',
-      status: 'Healthy',
+      status: 'Operational',
       uptime: '99.7%',
-      responseTime: '300ms',
-      lastCheck: '2024-01-15 14:30:05',
-      dependencies: ['SendGrid API', 'Queue Service']
-    },
-    {
-      id: 6,
-      name: 'File Storage',
-      status: 'Healthy',
-      uptime: '99.9%',
-      responseTime: '150ms',
-      lastCheck: '2024-01-15 14:30:18',
-      dependencies: ['AWS S3', 'CDN']
+      responseTime: '180ms',
+      lastCheck: '2024-01-15 14:30:00'
     }
   ]);
 
-  const [alerts, setAlerts] = useState([
-    {
-      id: 1,
-      type: 'warning',
-      title: 'Database Response Time High',
-      message: 'Database response time is above normal threshold (180ms vs 150ms)',
-      timestamp: '2024-01-15 14:25:30',
-      severity: 'medium'
-    },
-    {
-      id: 2,
-      type: 'info',
-      title: 'Scheduled Maintenance Complete',
-      message: 'Database optimization completed successfully',
-      timestamp: '2024-01-15 12:00:00',
-      severity: 'low'
-    },
-    {
-      id: 3,
-      type: 'success',
-      title: 'High Traffic Handled',
-      message: 'System successfully handled 50% increase in traffic',
-      timestamp: '2024-01-15 10:30:00',
-      severity: 'low'
-    }
-  ]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Healthy': return 'text-green-600 bg-green-100';
-      case 'Warning': return 'text-yellow-600 bg-yellow-100';
-      case 'Critical': return 'text-red-600 bg-red-100';
-      case 'Unknown': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'Operational': return 'bg-green-100 text-green-800';
+      case 'Degraded': return 'bg-yellow-100 text-yellow-800';
+      case 'Down': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Healthy': return <CheckCircle className="w-5 h-5" />;
-      case 'Warning': return <AlertTriangle className="w-5 h-5" />;
-      case 'Critical': return <XCircle className="w-5 h-5" />;
-      case 'Unknown': return <Clock className="w-5 h-5" />;
-      default: return <Clock className="w-5 h-5" />;
+      case 'Operational': return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'Degraded': return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+      case 'Down': return <AlertTriangle className="w-5 h-5 text-red-600" />;
+      default: return <Clock className="w-5 h-5 text-gray-600" />;
     }
   };
 
-  const getAlertColor = (type: string) => {
-    switch (type) {
-      case 'success': return 'border-l-green-500 bg-green-50';
-      case 'warning': return 'border-l-yellow-500 bg-yellow-50';
-      case 'error': return 'border-l-red-500 bg-red-50';
-      case 'info': return 'border-l-blue-500 bg-blue-50';
-      default: return 'border-l-gray-500 bg-gray-50';
-    }
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    // Simulate refresh
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsRefreshing(false);
+  };
+
+  const stats = {
+    totalServices: services.length,
+    operational: services.filter(s => s.status === 'Operational').length,
+    degraded: services.filter(s => s.status === 'Degraded').length,
+    averageUptime: services.reduce((sum, s) => sum + parseFloat(s.uptime), 0) / services.length
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">System Health Check (Analytics)</h1>
-            <p className="text-gray-600">Monitor system performance and health metrics</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+              System Health Check
+            </h1>
+            <p className="text-gray-600" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+              Monitor system performance and service status
+            </p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <RefreshCw className="w-4 h-4" />
-            Refresh
+          <button 
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg disabled:opacity-50"
+          >
+            {isRefreshing ? (
+              <RefreshCw className="w-5 h-5 animate-spin" />
+            ) : (
+              <RefreshCw className="w-5 h-5" />
+            )}
+            <span style={{ fontFamily: 'Molde Semi Expanded Bold' }}>Refresh</span>
           </button>
         </div>
       </div>
 
-      {/* Overall Health Status */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Overall System Health</h2>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${getStatusColor(systemMetrics.overallHealth)}`}>
-            {getStatusIcon(systemMetrics.overallHealth)}
-            <span className="font-medium">{systemMetrics.overallHealth}</span>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-[#098DCF] bg-opacity-10 rounded-xl">
+              <Server className="w-6 h-6 text-[#098DCF]" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Total Services
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.totalServices}
+              </p>
+            </div>
           </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Activity className="w-8 h-8 text-green-600" />
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-xl">
+              <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{systemMetrics.uptime}</p>
-            <p className="text-sm text-gray-600">Uptime</p>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Operational
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.operational}
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Zap className="w-8 h-8 text-blue-600" />
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-yellow-100 rounded-xl">
+              <AlertTriangle className="w-6 h-6 text-yellow-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{systemMetrics.responseTime}</p>
-            <p className="text-sm text-gray-600">Avg Response Time</p>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Degraded
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.degraded}
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <BarChart3 className="w-8 h-8 text-purple-600" />
+        </div>
+        <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all">
+          <div className="flex items-center">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <TrendingUp className="w-6 h-6 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{systemMetrics.errorRate}</p>
-            <p className="text-sm text-gray-600">Error Rate</p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Globe className="w-8 h-8 text-orange-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                Avg Uptime
+              </p>
+              <p className="text-2xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                {stats.averageUptime.toFixed(1)}%
+              </p>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{systemMetrics.activeUsers.toLocaleString()}</p>
-            <p className="text-sm text-gray-600">Active Users</p>
           </div>
         </div>
       </div>
 
-      {/* Service Status */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Status</h2>
-        <div className="space-y-4">
+      {/* Services Status */}
+      <div className="bg-white rounded-2xl border border-[#E8EEF7] overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+            Service Status
+          </h3>
+        </div>
+        <div className="divide-y divide-gray-200">
           {services.map((service) => (
-            <div key={service.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${getStatusColor(service.status)}`}>
-                    {getStatusIcon(service.status)}
+            <div key={service.id} className="px-6 py-4 hover:bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  {getStatusIcon(service.status)}
+                  <div>
+                    <div className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                      {service.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Last check: {service.lastCheck}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-6">
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-gray-900">
+                      {service.uptime}
+                    </div>
+                    <div className="text-sm text-gray-500">Uptime</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-gray-900">
+                      {service.responseTime}
+                    </div>
+                    <div className="text-sm text-gray-500">Response</div>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900">{service.name}</h3>
-                    <p className="text-xs text-gray-500">Last check: {service.lastCheck}</p>
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(service.status)}`}>
+                      {service.status}
+                    </span>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-900">{service.uptime}</div>
-                  <div className="text-xs text-gray-500">Uptime</div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Response Time</p>
-                  <p className="text-sm font-medium text-gray-900">{service.responseTime}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Dependencies</p>
-                  <div className="flex flex-wrap gap-1">
-                    {service.dependencies.map((dep, index) => (
-                      <span key={index} className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                        {dep}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Status</p>
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(service.status)}`}>
-                    {getStatusIcon(service.status)}
-                    {service.status}
-                  </span>
                 </div>
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Recent Alerts */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Alerts</h2>
-        <div className="space-y-3">
-          {alerts.map((alert) => (
-            <div key={alert.id} className={`flex items-start gap-3 p-3 rounded-lg border-l-4 ${getAlertColor(alert.type)}`}>
-              <div className="flex-shrink-0 mt-1">
-                {alert.type === 'success' && <CheckCircle className="w-5 h-5 text-green-600" />}
-                {alert.type === 'warning' && <AlertTriangle className="w-5 h-5 text-yellow-600" />}
-                {alert.type === 'error' && <XCircle className="w-5 h-5 text-red-600" />}
-                {alert.type === 'info' && <Activity className="w-5 h-5 text-blue-600" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">{alert.title}</p>
-                <p className="text-xs text-gray-500">{alert.message}</p>
-                <p className="text-xs text-gray-400 mt-1">{alert.timestamp}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Performance Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Response Time Trend</h3>
-          <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500">Chart visualization would go here</p>
-              <p className="text-sm text-gray-400">Last 24 hours: 120ms avg</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Error Rate Trend</h3>
-          <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <TrendingDown className="w-12 h-12 text-green-400 mx-auto mb-2" />
-              <p className="text-gray-500">Chart visualization would go here</p>
-              <p className="text-sm text-gray-400">Last 24 hours: 0.1% avg</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

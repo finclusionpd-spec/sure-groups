@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import { UserRole } from '../../types';
 
 const SuperAdminDashboard = lazy(() => 
@@ -35,7 +35,7 @@ export const DashboardRouter: React.FC = () => {
       {(() => {
         switch (role) {
           case 'super-admin':
-            return <SuperAdminDashboard />;
+            return <Navigate to="/superadmin/dashboard" replace />;
           case 'product-admin':
             return <ProductAdminDashboard />;
           case 'group-admin':

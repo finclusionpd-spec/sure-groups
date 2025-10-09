@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserManagement } from '../features/UserManagement';
-import { KYCManagement } from '../features/KYCManagement';
+import { KycKybManagement } from '../features/KycKybManagement';
 import { WalletManagement } from '../features/WalletManagement';
 import { ChatManagement } from '../features/ChatManagement';
 import { WalletManagementAdmin } from '../features/WalletManagementAdmin';
@@ -32,6 +32,7 @@ import { NotificationsAlerts } from '../features/NotificationsAlerts';
 import { ChatMessaging } from '../features/ChatMessaging';
 import { RatingsReviews } from '../features/RatingsReviews';
 import { ProfileSettings } from '../features/ProfileSettings';
+import { ProfileManagement } from '../features/ProfileManagement';
 import { MembershipManagement } from '../features/MembershipManagement';
 import { PerformanceTracking } from '../features/PerformanceTracking';
 import { ContentOversight } from '../features/ContentOversight';
@@ -77,7 +78,7 @@ import { VendorWallet } from '../features/VendorWallet';
 import { AssociationRegistrationPage } from '../features/AssociationRegistration';
 import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
 import { AnalyticsReports } from '../features/AnalyticsReports';
-import { DashboardManagement } from '../features/DashboardManagement';
+import { SuperAdminDashboard } from '../dashboards/SuperAdminDashboard';
 import { BulkHistoricalDataManagement } from '../features/BulkHistoricalDataManagement';
 import { BackgroundCheckManagement } from '../features/BackgroundCheckManagement';
 import { EscrowManagement } from '../features/EscrowManagement';
@@ -139,7 +140,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     case 'ratings-reviews':
       return <RatingsReviews />;
     case 'profile-settings':
-      return <ProfileSettings />;
+      // Use ProfileManagement for Super Admin, ProfileSettings for others
+      return user?.role === 'super-admin' ? <ProfileManagement /> : <ProfileSettings />;
     case 'meetings':
       return <Meetings />;
     case 'votings':
@@ -237,7 +239,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     case 'admin-user-management':
       return <AdminUserManagement />;
     case 'kyc-management':
-      return <KYCManagement />;
+      return <KycKybManagement />;
     case 'ticketing-system':
       return <TicketingSystem />;
     case 'group-management':
@@ -283,9 +285,14 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     case 'analytics-reports':
       return <AnalyticsReports />;
     
+    // Super Admin Features - Dashboard
+    case 'dashboard':
+      return <div className="p-6 text-center">
+        <div className="text-lg text-gray-600">Welcome to Super Admin Dashboard</div>
+        <div className="text-sm text-gray-500 mt-2">Use the sidebar to navigate to specific features</div>
+      </div>;
+    
     // Super Admin Features - User & Access Control
-    case 'dashboard-management':
-      return <DashboardManagement />;
     case 'bulk-historical-data':
       return <BulkHistoricalDataManagement />;
     case 'background-check':

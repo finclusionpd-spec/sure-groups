@@ -48,6 +48,7 @@ import {
   Template,
   HardDrive,
   Activity,
+  Crown,
   PieChart,
   Headphones,
   Palette
@@ -215,6 +216,12 @@ export const getProductAdminNavigation = (): NavigationGroup[] => [
 
 export const getSuperAdminNavigation = (): NavigationGroup[] => [
   {
+    title: 'Dashboard',
+    items: [
+      { id: 'dashboard', label: 'Super Admin Dashboard', icon: Crown }
+    ]
+  },
+  {
     title: 'User & Access Control',
     items: [
       { id: 'admin-user-management', label: 'Admin User Management', icon: Users },
@@ -224,9 +231,8 @@ export const getSuperAdminNavigation = (): NavigationGroup[] => [
     ]
   },
   {
-    title: 'Platform & Dashboard',
+    title: 'Platform Management',
     items: [
-      { id: 'dashboard-management', label: 'Dashboard Management', icon: BarChart3 },
       { id: 'regional-management', label: 'Regional Management', icon: Globe },
       { id: 'bulk-historical-data', label: 'Bulk Historical Data Management System', icon: Layers },
       { id: 'approval-workflow', label: 'Approval Work Flow Management', icon: CheckCircle }
