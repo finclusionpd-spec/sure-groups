@@ -25,6 +25,7 @@ import { DiscountsOffers } from '../features/DiscountsOffers';
 import { ProfessionalServices } from '../features/ProfessionalServices';
 import { PriorityInvitations } from '../features/PriorityInvitations';
 import { DisputeManagement } from '../features/DisputeManagement';
+import { SuperAdminDisputeManagement } from '../features/SuperAdminDisputeManagement';
 import { ReportsFlags } from '../features/ReportsFlags';
 import { Wallet } from '../features/Wallet';
 import { RewardsReferrals } from '../features/RewardsReferrals';
@@ -74,6 +75,7 @@ import { Votings } from '../features/Votings';
 import { Donations } from '../features/Donations';
 import { DonationManagement } from '../features/DonationManagement';
 import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
+import { SuperAdminApprovalWorkflowManagement } from '../features/SuperAdminApprovalWorkflowManagement';
 import { VendorWallet } from '../features/VendorWallet';
 import { AssociationRegistrationPage } from '../features/AssociationRegistration';
 import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
@@ -82,8 +84,11 @@ import { SuperAdminDashboard } from '../dashboards/SuperAdminDashboard';
 import { BulkHistoricalDataManagement } from '../features/BulkHistoricalDataManagement';
 import { BackgroundCheckManagement } from '../features/BackgroundCheckManagement';
 import { EscrowManagement } from '../features/EscrowManagement';
+import { SuperAdminEscrowManagement } from '../features/SuperAdminEscrowManagement';
+import { SuperAdminSubscriptionFeeManagement } from '../features/SuperAdminSubscriptionFeeManagement';
 import { SubscriptionFeeManagement } from '../features/SubscriptionFeeManagement';
 import { ThirdPartyIntegrationManagement } from '../features/ThirdPartyIntegrationManagement';
+import { SuperAdminThirdPartyIntegrationManagement } from '../features/SuperAdminThirdPartyIntegrationManagement';
 import { APIIntegrationManagement } from '../features/APIIntegrationManagement';
 import { DeveloperToolsSandboxManagement } from '../features/DeveloperToolsSandboxManagement';
 import { EmailTemplateManagement } from '../features/EmailTemplateManagement';
@@ -122,7 +127,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     case 'orders':
       return <MyOrders />;
     case 'dispute-management':
-      return <DisputeManagement />;
+      return user?.role === 'super-admin' ? <SuperAdminDisputeManagement /> : <DisputeManagement />;
     case 'reports-flags':
       return <ReportsFlags />;
     case 'wallet':
@@ -245,7 +250,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     case 'group-management':
       return <GroupManagement />;
     case 'approval-workflow':
-      return <ApprovalWorkflow />;
+      return user?.role === 'super-admin' ? <SuperAdminApprovalWorkflowManagement /> : <ApprovalWorkflow />;
     case 'event-management':
       return <EventManagement />;
     case 'feature-management':
@@ -300,13 +305,13 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     
     // Super Admin Features - Finance & Transactions
     case 'escrow-management':
-      return <EscrowManagement />;
+      return user?.role === 'super-admin' ? <SuperAdminEscrowManagement /> : <EscrowManagement />;
     case 'subscription-fee':
-      return <SubscriptionFeeManagement />;
+      return user?.role === 'super-admin' ? <SuperAdminSubscriptionFeeManagement /> : <SubscriptionFeeManagement />;
     
     // Super Admin Features - Integrations & Developer Tools
     case 'third-party-integration':
-      return <ThirdPartyIntegrationManagement />;
+      return user?.role === 'super-admin' ? <SuperAdminThirdPartyIntegrationManagement /> : <ThirdPartyIntegrationManagement />;
     case 'api-integration':
       return <APIIntegrationManagement />;
     case 'developer-tools':

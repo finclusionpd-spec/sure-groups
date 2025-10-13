@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Code, 
   Key, 
@@ -10,42 +10,84 @@ import {
   Plus,
   Globe,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Trash2
 } from 'lucide-react';
+import { APIIntegration, apiIntegrationService } from '../../services/apiIntegration';
+import { APIIntegrationModal } from './modals/APIIntegrationModal';
 
 export const APIIntegrationManagement: React.FC = () => {
-  const [apis, setApis] = useState([
-    {
-      id: '1',
-      name: 'User Management API',
-      endpoint: '/api/users',
-      method: 'REST',
-      status: 'Active',
-      requests: 12500,
-      lastUsed: '2024-01-15 14:30:00'
-    },
-    {
-      id: '2',
-      name: 'Payment Processing API',
-      endpoint: '/api/payments',
-      method: 'REST',
-      status: 'Active',
-      requests: 8500,
-      lastUsed: '2024-01-15 12:00:00'
-    },
-    {
-      id: '3',
-      name: 'Analytics API',
-      endpoint: '/api/analytics',
-      method: 'GraphQL',
-      status: 'Inactive',
-      requests: 0,
-      lastUsed: '2024-01-10 09:15:00'
-    }
-  ]);
-
+  const [apis, setApis] = useState<APIIntegration[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedApi, setSelectedApi] = useState<APIIntegration | null>(null);
+
+  // Load APIs on component mount
+  useEffect(() => {
+    loadAPIs();
+  }, []);
+
+  const loadAPIs = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await apiIntegrationService.getAPIIntegrations();
+      setApis(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load APIs');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateAPI = () => {
+    setSelectedApi(null);
+    setModalMode('create');
+    setShowModal(true);
+  };
+
+  const handleViewAPI = (api: APIIntegration) => {
+    setSelectedApi(api);
+    setModalMode('view');
+    setShowModal(true);
+  };
+
+  const handleEditAPI = (api: APIIntegration) => {
+    setSelectedApi(api);
+    setModalMode('edit');
+    setShowModal(true);
+  };
+
+  const handleDeleteAPI = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this API integration?')) return;
+    
+    try {
+      await apiIntegrationService.deleteAPIIntegration(id);
+      await loadAPIs();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete API');
+    }
+  };
+
+  const handleSaveAPI = async (apiData: Omit<APIIntegration, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      if (modalMode === 'create') {
+        await apiIntegrationService.createAPIIntegration(apiData);
+      } else if (modalMode === 'edit' && selectedApi) {
+        await apiIntegrationService.updateAPIIntegration(selectedApi.id, apiData);
+      }
+      await loadAPIs();
+      setShowModal(false);
+    } catch (err) {
+      throw err; // Re-throw to be handled by modal
+    }
+  };
 
   const filteredApis = apis.filter(api => {
     const matchesSearch = api.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,7 +125,10 @@ export const APIIntegrationManagement: React.FC = () => {
               Manage API endpoints and integrations
             </p>
           </div>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg">
+          <button 
+            onClick={handleCreateAPI}
+            className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg"
+          >
             <Plus className="w-5 h-5" />
             <span style={{ fontFamily: 'Molde Semi Expanded Bold' }}>New API</span>
           </button>
@@ -241,11 +286,26 @@ export const APIIntegrationManagement: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors">
+                      <button 
+                        onClick={() => handleViewAPI(api)}
+                        className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View API"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors">
+                      <button 
+                        onClick={() => handleEditAPI(api)}
+                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+                        title="Edit API"
+                      >
                         <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteAPI(api.id)}
+                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete API"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -255,6 +315,41 @@ export const APIIntegrationManagement: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Modal */}
+      <APIIntegrationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={handleSaveAPI}
+        integration={selectedApi}
+        mode={modalMode}
+      />
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 flex items-center gap-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#098DCF]"></div>
+            <span className="text-gray-700" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+              Loading APIs...
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 z-50">
+          <div className="w-2 h-2 rounded-full bg-red-500"></div>
+          <span className="text-red-700">{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="text-red-500 hover:text-red-700"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 };

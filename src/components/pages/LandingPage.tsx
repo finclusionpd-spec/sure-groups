@@ -21,7 +21,7 @@ export const LandingPage: React.FC = () => {
                 <SureGroupsLogo size="lg" showText={true} />
               </Link>
               <div className="hidden sm:block">
-                <AWSLogo size="md" showText={true} />
+                <AWSLogo showSecurityText={true} />
               </div>
             </div>
             <div className="flex items-center space-x-4">

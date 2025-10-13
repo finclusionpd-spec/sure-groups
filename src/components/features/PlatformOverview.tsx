@@ -348,7 +348,7 @@ export const PlatformOverview: React.FC<PlatformOverviewProps> = ({ onNavigate }
           <div className="space-y-3">
             {alerts.map((alert) => (
               <div key={alert.id} className={`flex items-start p-3 rounded-lg ${
-                alert.resolved ? 'bg-gray-50' : 'bg-yellow-50'
+                alert.resolved ? 'bg-gray-50' : getAlertColor(alert.type)
               }`}>
                 <div className="flex-shrink-0 mr-3 mt-0.5">
                   {getAlertIcon(alert.type)}

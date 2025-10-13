@@ -1,85 +1,56 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 
 interface AWSLogoProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  showText?: boolean;
+  showSecurityText?: boolean;
   className?: string;
 }
 
 export const AWSLogo: React.FC<AWSLogoProps> = ({ 
-  size = 'md', 
-  showText = true, 
-  className = '' 
+  showSecurityText = true,
+  className = ''
 }) => {
-  const sizeClasses = {
-    sm: 'w-20 h-8',
-    md: 'w-24 h-10',
-    lg: 'w-28 h-12',
-    xl: 'w-32 h-14'
-  };
-
-  const textSizeClasses = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base',
-    xl: 'text-lg'
-  };
-
   return (
-    <div className={`flex items-center space-x-3 ${className}`}>
-      {/* AWS Logo */}
-      <div className="flex flex-col items-start">
-        <span className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className={`flex items-center bg-white px-3 py-1.5 rounded-md ${className}`}>
+      {/* AWS Logo Section */}
+      <div className="flex items-center">
+        {/* AWS Text */}
+        <span className="text-gray-800 font-normal text-sm">
           aws
         </span>
+        
+        {/* Amazon Smile */}
         <svg
-          width="60"
+          className="ml-0.5"
+          width="18"
           height="8"
-          viewBox="0 0 60 8"
-          className="mt-1"
+          viewBox="0 0 18 8"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M0 4 Q30 0 60 4"
+            d="M2 5C5 1 13 1 16 5"
             stroke="#FF9900"
             strokeWidth="2"
-            fill="none"
             strokeLinecap="round"
+            fill="none"
           />
         </svg>
       </div>
 
-      {/* Separator Line */}
-      <div className="w-px h-8 bg-gray-300"></div>
+      {showSecurityText && (
+        <>
+          {/* Vertical Separator */}
+          <div className="h-5 w-px bg-gray-300 mx-2"></div>
 
-      {/* Security Text */}
-      {showText && (
-        <div className="flex items-center space-x-2">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-gray-600"
-          >
-            <path
-              d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z"
-              fill="currentColor"
-            />
-            <path
-              d="M9 12L11 14L15 10"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className={`text-gray-600 font-medium uppercase tracking-wide ${textSizeClasses[size]}`}>
-            DATA SECURITY
-          </span>
-        </div>
+          {/* Data Security Section */}
+          <div className="flex items-center space-x-1.5">
+            <Lock className="h-4 w-4 text-gray-700" />
+            <span className="text-gray-800 font-semibold uppercase text-sm tracking-normal">
+              DATA SECURITY
+            </span>
+          </div>
+        </>
       )}
     </div>
   );

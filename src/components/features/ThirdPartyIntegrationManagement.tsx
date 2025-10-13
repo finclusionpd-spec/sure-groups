@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plug, 
   Settings, 
@@ -10,39 +10,84 @@ import {
   Plus,
   Activity,
   Globe,
-  Shield
+  Shield,
+  Trash2
 } from 'lucide-react';
+import { ThirdPartyIntegration, apiIntegrationService } from '../../services/apiIntegration';
+import { ThirdPartyIntegrationModal } from './modals/ThirdPartyIntegrationModal';
 
 export const ThirdPartyIntegrationManagement: React.FC = () => {
-  const [integrations, setIntegrations] = useState([
-    {
-      id: '1',
-      name: 'Stripe Payment Gateway',
-      type: 'Payment',
-      status: 'Active',
-      lastSync: '2024-01-15 14:30:00',
-      description: 'Payment processing integration'
-    },
-    {
-      id: '2',
-      name: 'SendGrid Email Service',
-      type: 'Communication',
-      status: 'Active',
-      lastSync: '2024-01-15 12:00:00',
-      description: 'Email delivery service'
-    },
-    {
-      id: '3',
-      name: 'AWS S3 Storage',
-      type: 'Storage',
-      status: 'Inactive',
-      lastSync: '2024-01-10 09:15:00',
-      description: 'Cloud storage integration'
-    }
-  ]);
-
+  const [integrations, setIntegrations] = useState<ThirdPartyIntegration[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedIntegration, setSelectedIntegration] = useState<ThirdPartyIntegration | null>(null);
+
+  // Load integrations on component mount
+  useEffect(() => {
+    loadIntegrations();
+  }, []);
+
+  const loadIntegrations = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await apiIntegrationService.getThirdPartyIntegrations();
+      setIntegrations(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load integrations');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateIntegration = () => {
+    setSelectedIntegration(null);
+    setModalMode('create');
+    setShowModal(true);
+  };
+
+  const handleViewIntegration = (integration: ThirdPartyIntegration) => {
+    setSelectedIntegration(integration);
+    setModalMode('view');
+    setShowModal(true);
+  };
+
+  const handleEditIntegration = (integration: ThirdPartyIntegration) => {
+    setSelectedIntegration(integration);
+    setModalMode('edit');
+    setShowModal(true);
+  };
+
+  const handleDeleteIntegration = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this integration?')) return;
+    
+    try {
+      await apiIntegrationService.deleteThirdPartyIntegration(id);
+      await loadIntegrations();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete integration');
+    }
+  };
+
+  const handleSaveIntegration = async (integrationData: Omit<ThirdPartyIntegration, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      if (modalMode === 'create') {
+        await apiIntegrationService.createThirdPartyIntegration(integrationData);
+      } else if (modalMode === 'edit' && selectedIntegration) {
+        await apiIntegrationService.updateThirdPartyIntegration(selectedIntegration.id, integrationData);
+      }
+      await loadIntegrations();
+      setShowModal(false);
+    } catch (err) {
+      throw err; // Re-throw to be handled by modal
+    }
+  };
 
   const filteredIntegrations = integrations.filter(integration => {
     const matchesSearch = integration.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,7 +125,10 @@ export const ThirdPartyIntegrationManagement: React.FC = () => {
               Manage external service integrations
             </p>
           </div>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg">
+          <button 
+            onClick={handleCreateIntegration}
+            className="flex items-center gap-2 px-6 py-3 bg-[#098DCF] text-white rounded-xl hover:bg-[#0F2A75] transition-colors shadow-lg"
+          >
             <Plus className="w-5 h-5" />
             <span style={{ fontFamily: 'Molde Semi Expanded Bold' }}>New Integration</span>
           </button>
@@ -232,11 +280,26 @@ export const ThirdPartyIntegrationManagement: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors">
+                      <button 
+                        onClick={() => handleViewIntegration(integration)}
+                        className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Integration"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors">
+                      <button 
+                        onClick={() => handleEditIntegration(integration)}
+                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+                        title="Edit Integration"
+                      >
                         <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteIntegration(integration.id)}
+                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Integration"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -246,6 +309,41 @@ export const ThirdPartyIntegrationManagement: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Modal */}
+      <ThirdPartyIntegrationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={handleSaveIntegration}
+        integration={selectedIntegration}
+        mode={modalMode}
+      />
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 flex items-center gap-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#098DCF]"></div>
+            <span className="text-gray-700" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+              Loading integrations...
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 z-50">
+          <div className="w-2 h-2 rounded-full bg-red-500"></div>
+          <span className="text-red-700">{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="text-red-500 hover:text-red-700"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 };
