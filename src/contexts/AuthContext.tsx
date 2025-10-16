@@ -20,6 +20,7 @@ interface AuthContextType extends AuthState {
   setUser: (user: User | null) => void;
   resetPassword: (token: string, password: string) => Promise<boolean>;
   updateKycTier: (tier: 'tier1' | 'tier2' | 'tier3', status: 'pending' | 'verified' | 'skipped') => void;
+  updateKycData: (kycData: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -188,6 +189,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateKycData = (kycData: any) => {
+    if (!authState.user) return;
+    
+    const updatedUser = {
+      ...authState.user,
+      kycData: {
+        ...authState.user.kycData,
+        ...kycData
+      }
+    };
+    
+    // If liveness photo is provided, automatically set it as profile image
+    if (kycData.livenessPhoto) {
+      updatedUser.profileImage = kycData.livenessPhoto;
+    }
+    
+    localStorage.setItem('sure-groups-user', JSON.stringify(updatedUser));
+    setAuthState(prev => ({
+      ...prev,
+      user: updatedUser
+    }));
+  };
+
   const updateKycTier = (tier: 'tier1' | 'tier2' | 'tier3', status: 'pending' | 'verified' | 'skipped') => {
     setAuthState(prev => {
       const currentUser = prev.user;
@@ -285,6 +309,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     startDemo,
     setUser,
     updateKycTier,
+    updateKycData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

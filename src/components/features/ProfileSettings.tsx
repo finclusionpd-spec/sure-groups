@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, Mail, Phone, MapPin, Shield, Bell, Globe, Eye, EyeOff, Smartphone, Key, CreditCard, Banknote, Trash2, Download, Lock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface ProfileData {
   fullName: string;
@@ -248,14 +249,15 @@ export const ProfileSettings: React.FC = () => {
             <h2 className="text-lg font-semibold text-gray-900 mb-6">Profile Information</h2>
             
             <div className="flex items-center space-x-6 mb-6">
-              <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-2xl">{profile.avatar}</span>
-              </div>
+              <UserAvatar user={user!} size="xl" showVerification={true} />
               <div>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
-                  Change Photo
-                </button>
-                <p className="text-xs text-gray-500 mt-1">JPG, PNG up to 5MB</p>
+                <p className="text-sm font-medium text-gray-900">Profile Photo</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {user?.kycData?.livenessPhoto 
+                    ? 'Set from identity verification' 
+                    : 'Complete identity verification to set your profile photo'
+                  }
+                </p>
               </div>
             </div>
 

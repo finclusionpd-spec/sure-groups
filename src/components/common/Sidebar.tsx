@@ -79,13 +79,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ groups, logo, onFeatureSelect,
             </button>
           </div>
 
-          {/* User info */}
-          {isDemoMode && (
-            <div className="px-6 py-3 bg-amber-50 border-b border-amber-200">
-              <p className="text-sm font-medium text-amber-800">Demo Mode</p>
-              <p className="text-xs text-amber-600 capitalize">{user?.role?.replace('-', ' ')} Dashboard</p>
-            </div>
-          )}
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4">

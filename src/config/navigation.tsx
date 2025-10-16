@@ -117,8 +117,7 @@ export const getGroupAdminNavigation = (): NavigationGroup[] => [
     title: 'Dashboard & Overview',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: Home },
-      { id: 'user-tour', label: 'User Tour Guide', icon: HelpCircle },
-      { id: 'group-overview', label: 'Group Overview', icon: Users }
+      { id: 'user-tour', label: 'User Tour Guide', icon: HelpCircle }
     ]
   },
   {

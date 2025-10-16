@@ -4,7 +4,8 @@ import {
   Download, Filter, MoreHorizontal, Settings, UserCheck, AlertTriangle,
   Mail, Phone, MapPin, Calendar, Clock, CheckCircle, XCircle, Ban
 } from 'lucide-react';
-import { UserRole } from '../../types';
+import { UserRole, User } from '../../types';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface UserProfile {
   id: string;
@@ -678,11 +679,28 @@ export const ProfileManagement: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span className="text-white font-medium text-sm">
-                                  {profile.avatar}
-                                </span>
-                              </div>
+                              <UserAvatar 
+                                user={{
+                                  id: profile.id,
+                                  fullName: profile.fullName,
+                                  email: profile.email,
+                                  role: profile.role,
+                                  isEmailVerified: profile.emailVerified,
+                                  kycTiers: {
+                                    tier1: profile.kycStatus === 'verified' ? 'verified' : 'pending',
+                                    tier2: profile.kycStatus === 'verified' ? 'verified' : 'pending',
+                                    tier3: profile.role === 'vendor' || profile.role === 'group-admin' 
+                                      ? (profile.kycStatus === 'verified' ? 'verified' : 'pending')
+                                      : 'skipped'
+                                  },
+                                  kycData: {
+                                    livenessPhoto: profile.avatar.startsWith('http') ? profile.avatar : undefined
+                                  },
+                                  createdAt: profile.joinDate
+                                } as User}
+                                size="sm" 
+                                showVerification={true}
+                              />
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-900">{profile.fullName}</div>
                                 <div className="text-sm text-gray-500">{profile.email}</div>
@@ -799,9 +817,28 @@ export const ProfileManagement: React.FC = () => {
                   <div key={profile.id} className="bg-white border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">{profile.avatar}</span>
-                        </div>
+                        <UserAvatar 
+                          user={{
+                            id: profile.id,
+                            fullName: profile.fullName,
+                            email: profile.email,
+                            role: profile.role,
+                            isEmailVerified: profile.emailVerified,
+                            kycTiers: {
+                              tier1: profile.kycStatus === 'verified' ? 'verified' : 'pending',
+                              tier2: profile.kycStatus === 'verified' ? 'verified' : 'pending',
+                              tier3: profile.role === 'vendor' || profile.role === 'group-admin' 
+                                ? (profile.kycStatus === 'verified' ? 'verified' : 'pending')
+                                : 'skipped'
+                            },
+                            kycData: {
+                              livenessPhoto: profile.avatar.startsWith('http') ? profile.avatar : undefined
+                            },
+                            createdAt: profile.joinDate
+                          } as User}
+                          size="sm" 
+                          showVerification={true}
+                        />
                         <div>
                           <h3 className="font-semibold text-gray-900">{profile.fullName}</h3>
                           <p className="text-sm text-gray-500">{profile.email}</p>
@@ -991,6 +1028,7 @@ export const ProfileManagement: React.FC = () => {
     </div>
   );
 };
+
 
 
 

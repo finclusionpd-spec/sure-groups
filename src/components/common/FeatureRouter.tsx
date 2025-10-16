@@ -34,6 +34,7 @@ import { ChatMessaging } from '../features/ChatMessaging';
 import { RatingsReviews } from '../features/RatingsReviews';
 import { ProfileSettings } from '../features/ProfileSettings';
 import { ProfileManagement } from '../features/ProfileManagement';
+import { UnifiedProfileSettings } from '../features/UnifiedProfileSettings';
 import { MembershipManagement } from '../features/MembershipManagement';
 import { PerformanceTracking } from '../features/PerformanceTracking';
 import { ContentOversight } from '../features/ContentOversight';
@@ -63,7 +64,6 @@ import { ComplianceCenter } from '../features/ComplianceCenter';
 import { DeveloperRatings } from '../features/DeveloperRatings';
 // removed unused imports DeveloperChat, HelpCenter
 import { VendorMarketplace } from '../features/VendorMarketplace';
-import { GroupOverview } from '../features/GroupOverview';
 import { SystemSettings } from '../features/SystemSettings';
 import { SecurityManagement } from '../features/SecurityManagement';
 import { AuditLogs } from '../features/AuditLogs';
@@ -145,8 +145,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
     case 'ratings-reviews':
       return <RatingsReviews />;
     case 'profile-settings':
-      // Use ProfileManagement for Super Admin, ProfileSettings for others
-      return user?.role === 'super-admin' ? <ProfileManagement /> : <ProfileSettings />;
+      // Use ProfileManagement for Super Admin, UnifiedProfileSettings for others
+      return user?.role === 'super-admin' ? <ProfileManagement /> : <UnifiedProfileSettings />;
     case 'meetings':
       return <Meetings />;
     case 'votings':
@@ -211,8 +211,6 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavig
       return <NotificationsAlerts />;
     case 'chat':
       return <ChatMessaging />;
-    case 'group-overview':
-      return <GroupOverview />;
     case 'user-management':
       return <UserManagement />;
     case 'group-admin-management':

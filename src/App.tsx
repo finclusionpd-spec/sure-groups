@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LandingPage } from './components/pages/LandingPage';
-import { LoginForm } from './components/auth/LoginForm';
+import { EnhancedLoginForm } from './components/auth/EnhancedLoginForm';
 import { ForgotPasswordForm } from './components/auth/ForgotPasswordForm';
 import { EmailVerificationPage } from './components/auth/EmailVerificationPage';
 import { DemoRoleSelection } from './components/auth/DemoRoleSelection';
@@ -23,7 +23,7 @@ const AppRoutes: React.FC = () => {
       <Route 
         path="/login" 
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginForm />
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <EnhancedLoginForm />
         } 
       />
       <Route 

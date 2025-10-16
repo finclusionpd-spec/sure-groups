@@ -18,6 +18,29 @@ export interface User {
     tier2?: 'pending' | 'verified' | 'skipped';
     tier3?: 'pending' | 'verified' | 'skipped';
   };
+  kycData?: {
+    livenessPhoto?: string;
+    bvnData?: {
+      fullName: string;
+      dateOfBirth: string;
+      phoneNumber: string;
+      bankName: string;
+    };
+    ninData?: {
+      fullName: string;
+      dateOfBirth: string;
+      gender: string;
+      stateOfOrigin: string;
+    };
+    businessData?: {
+      businessName: string;
+      cacNumber?: string;
+      businessPhone: string;
+      businessEmail: string;
+      businessAddress: string;
+    };
+  };
+  profileImage?: string; // Deprecated - will be replaced by liveness photo
   createdAt: string;
 }
 
