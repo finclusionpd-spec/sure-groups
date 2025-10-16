@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserAvatar } from '../common/UserAvatar';
+import { DatePicker } from '../common/DatePicker';
 import { UserRole } from '../../types';
 
 interface PersonalInfo {
@@ -317,12 +318,14 @@ export const UnifiedProfileSettings: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                    <input
-                      type="date"
+                    <DatePicker
                       value={personalInfo.dateOfBirth}
-                      onChange={(e) => setPersonalInfo({...personalInfo, dateOfBirth: e.target.value})}
-                      disabled={!isEditing}
+                      onChange={(value) => setPersonalInfo({...personalInfo, dateOfBirth: value})}
+                      placeholder="e.g., 08/15/1999"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      disabled={!isEditing}
+                      minDate="1900-01-01"
+                      maxDate={new Date().toISOString().split('T')[0]}
                     />
                   </div>
                   <div className="md:col-span-2">

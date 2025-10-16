@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { SureGroupsLogo } from '../common/SureGroupsLogo';
 import { EnhancedKycVerification } from '../kyc/EnhancedKycVerification';
+import { DatePicker } from '../common/DatePicker';
 
 type StepKey = 'role' | 'basic' | 'otp' | 'kyc';
 
@@ -41,6 +42,11 @@ const isValidDateOfBirth = (dateStr: string): boolean => {
   
   // Check if the date is valid
   if (isNaN(birthDate.getTime())) return false;
+  
+  // Check if date is within valid range (1900 to current year)
+  const year = birthDate.getFullYear();
+  const currentYear = new Date().getFullYear();
+  if (year < 1900 || year > currentYear) return false;
   
   // Check if person is at least 18 years old
   const today = new Date();
@@ -398,21 +404,18 @@ export const SignUpWizard: React.FC = () => {
               {/* Date of Birth */}
               <div className="space-y-2">
                 <label className="label-brand">Date of Birth *</label>
-                <input 
-                  type="date"
-                  className="input-brand" 
-                  placeholder="Select your Date of Birth (MM/DD/YYYY)"
-                  value={basic.dateOfBirth} 
-                  onChange={(e) => {
-                    setBasic({...basic, dateOfBirth: e.target.value});
-                  }}
-                  min="1900-01-01"
-                  max={new Date().toISOString().split('T')[0]}
-                  required 
+                <DatePicker
+                  value={basic.dateOfBirth}
+                  onChange={(value) => setBasic({...basic, dateOfBirth: value})}
+                  placeholder="e.g., 08/15/1999"
+                  className="input-brand"
+                  minDate="1900-01-01"
+                  maxDate={new Date().toISOString().split('T')[0]}
+                  required
                 />
                 {basic.dateOfBirth && !isValidDateOfBirth(basic.dateOfBirth) && (
                   <p className="text-sm text-red-500">
-                    Please ensure you are 18 or older
+                    Please ensure you are 18 or older and enter a valid date
                   </p>
                 )}
                 {basic.dateOfBirth && isValidDateOfBirth(basic.dateOfBirth) && (
