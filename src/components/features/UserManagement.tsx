@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Search, Plus, Edit, Trash2, Shield, Mail, MoreHorizontal, Eye, UserPlus, UserMinus, Crown, Filter, Download } from 'lucide-react';
 import { UserData, UserRole } from '../../types';
 
@@ -63,13 +63,25 @@ export const UserManagement: React.FC = () => {
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [bulkActions, setBulkActions] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<'name' | 'role' | 'status' | 'lastLogin' | 'createdAt'>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const [newUser, setNewUser] = useState({
     fullName: '',
     email: '',
     role: 'member' as UserRole,
     status: 'active' as const,
-    sendWelcomeEmail: true
+    phone: '',
+    organization: '',
+    department: '',
+    position: '',
+    location: '',
+    sendWelcomeEmail: true,
+    requireEmailVerification: true,
+    assignToGroups: [] as string[],
+    notes: ''
   });
 
   const filteredUsers = users.filter(user => {
@@ -80,16 +92,76 @@ export const UserManagement: React.FC = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  const sortedUsers = useMemo(() => {
+    const list = [...filteredUsers];
+    list.sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1;
+      switch (sortBy) {
+        case 'name':
+          return a.fullName.localeCompare(b.fullName) * dir;
+        case 'role':
+          return a.role.localeCompare(b.role) * dir;
+        case 'status':
+          return a.status.localeCompare(b.status) * dir;
+        case 'lastLogin':
+          return (new Date(a.lastLogin).getTime() - new Date(b.lastLogin).getTime()) * dir;
+        case 'createdAt':
+          return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * dir;
+        default:
+          return 0;
+      }
+    });
+    return list;
+  }, [filteredUsers, sortBy, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedUsers.length / pageSize));
+  const pagedUsers = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return sortedUsers.slice(start, start + pageSize);
+  }, [sortedUsers, page]);
+
+  const setSort = (column: typeof sortBy) => {
+    if (sortBy === column) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDir('asc');
+    }
+  };
+
   const handleAddUser = () => {
+    // Basic validation
+    if (!newUser.fullName.trim() || !newUser.email.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     const user: UserData = {
       id: Date.now().toString(),
-      ...newUser,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      role: newUser.role,
+      status: newUser.status,
       lastLogin: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-      isEmailVerified: false
+      isEmailVerified: !newUser.requireEmailVerification
     };
     setUsers([...users, user]);
-    setNewUser({ fullName: '', email: '', role: 'member', status: 'active', sendWelcomeEmail: true });
+    setNewUser({ 
+      fullName: '', 
+      email: '', 
+      role: 'member', 
+      status: 'active',
+      phone: '',
+      organization: '',
+      department: '',
+      position: '',
+      location: '',
+      sendWelcomeEmail: true,
+      requireEmailVerification: true,
+      assignToGroups: [],
+      notes: ''
+    });
     setShowAddModal(false);
     
     if (newUser.sendWelcomeEmail) {
@@ -198,6 +270,12 @@ export const UserManagement: React.FC = () => {
       default: return <Shield className="w-4 h-4" />;
     }
   };
+
+  const organizations = ['Acme Corp', 'Tech Solutions Inc', 'Global Services', 'Innovation Labs', 'Enterprise Group'];
+  const departments = ['Engineering', 'Sales', 'Marketing', 'Support', 'Operations', 'Finance', 'HR'];
+  const positions = ['Manager', 'Developer', 'Analyst', 'Coordinator', 'Specialist', 'Director', 'Executive'];
+  const locations = ['New York', 'San Francisco', 'London', 'Tokyo', 'Sydney', 'Toronto', 'Berlin'];
+  const availableGroups = ['General Members', 'Premium Users', 'Beta Testers', 'VIP Members', 'Community Leaders'];
 
   const totalUsers = users.length;
   const activeUsers = users.filter(u => u.status === 'active').length;
@@ -359,16 +437,16 @@ export const UserManagement: React.FC = () => {
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th onClick={() => setSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">User {sortBy==='name' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
+                <th onClick={() => setSort('role')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">Role {sortBy==='role' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
+                <th onClick={() => setSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">Status {sortBy==='status' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
+                <th onClick={() => setSort('lastLogin')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">Last Login {sortBy==='lastLogin' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
+                <th onClick={() => setSort('createdAt')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">Created {sortBy==='createdAt' ? (sortDir==='asc'?'▲':'▼') : ''}</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
+              {pagedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -445,84 +523,248 @@ export const UserManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination */}
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="text-sm text-gray-600">
+            Page {page} of {totalPages} • Showing {pagedUsers.length} of {sortedUsers.length}
+          </div>
+          <div className="space-x-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Add User Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New User</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  value={newUser.fullName}
-                  onChange={(e) => setNewUser({...newUser, fullName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Add New User</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h4 className="text-md font-medium text-gray-900 border-b pb-2">Basic Information</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newUser.fullName}
+                    onChange={(e) => setNewUser({...newUser, fullName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter full name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="user@company.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+                  <select
+                    value={newUser.organization}
+                    onChange={(e) => setNewUser({...newUser, organization: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Organization</option>
+                    {organizations.map(org => (
+                      <option key={org} value={org}>{org}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select
-                  value={newUser.role}
-                  onChange={(e) => setNewUser({...newUser, role: e.target.value as UserRole})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="member">Member</option>
-                  <option value="group-admin">Group Admin</option>
-                  <option value="product-admin">Product Admin</option>
-                  <option value="vendor">Vendor</option>
-                  <option value="developer">Developer</option>
-                  <option value="super-admin">Super Admin</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select
-                  value={newUser.status}
-                  onChange={(e) => setNewUser({...newUser, status: e.target.value as any})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="active">Active</option>
-                  <option value="pending">Pending</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="sendWelcomeEmail"
-                  checked={newUser.sendWelcomeEmail}
-                  onChange={(e) => setNewUser({...newUser, sendWelcomeEmail: e.target.checked})}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="sendWelcomeEmail" className="text-sm text-gray-700">
-                  Send welcome email
-                </label>
+
+              {/* Professional Information */}
+              <div className="space-y-4">
+                <h4 className="text-md font-medium text-gray-900 border-b pb-2">Professional Information</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                  <select
+                    value={newUser.department}
+                    onChange={(e) => setNewUser({...newUser, department: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                  <select
+                    value={newUser.position}
+                    onChange={(e) => setNewUser({...newUser, position: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Position</option>
+                    {positions.map(pos => (
+                      <option key={pos} value={pos}>{pos}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <select
+                    value={newUser.location}
+                    onChange={(e) => setNewUser({...newUser, location: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Location</option>
+                    {locations.map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    User Role <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({...newUser, role: e.target.value as UserRole})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="member">Member</option>
+                    <option value="group-admin">Group Admin</option>
+                    <option value="product-admin">Product Admin</option>
+                    <option value="vendor">Vendor</option>
+                    <option value="developer">Developer</option>
+                    <option value="super-admin">Super Admin</option>
+                  </select>
+                </div>
               </div>
             </div>
-            <div className="flex justify-end space-x-3 mt-6">
+
+            {/* Account Settings */}
+            <div className="mt-6 space-y-4">
+              <h4 className="text-md font-medium text-gray-900 border-b pb-2">Account Settings</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Account Status <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={newUser.status}
+                    onChange={(e) => setNewUser({...newUser, status: e.target.value as any})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Groups</label>
+                  <div className="space-y-2 max-h-24 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                    {availableGroups.map(group => (
+                      <label key={group} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={newUser.assignToGroups.includes(group)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNewUser({...newUser, assignToGroups: [...newUser.assignToGroups, group]});
+                            } else {
+                              setNewUser({...newUser, assignToGroups: newUser.assignToGroups.filter(g => g !== group)});
+                            }
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{group}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Options */}
+            <div className="mt-6 space-y-4">
+              <h4 className="text-md font-medium text-gray-900 border-b pb-2">Additional Options</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="sendWelcomeEmail"
+                    checked={newUser.sendWelcomeEmail}
+                    onChange={(e) => setNewUser({...newUser, sendWelcomeEmail: e.target.checked})}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="sendWelcomeEmail" className="text-sm text-gray-700">
+                    Send welcome email with login credentials
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="requireEmailVerification"
+                    checked={newUser.requireEmailVerification}
+                    onChange={(e) => setNewUser({...newUser, requireEmailVerification: e.target.checked})}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="requireEmailVerification" className="text-sm text-gray-700">
+                    Require email verification
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={newUser.notes}
+                  onChange={(e) => setNewUser({...newUser, notes: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={3}
+                  placeholder="Additional notes about this user..."
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-8 pt-4 border-t">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddUser}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Add User
+                Create User
               </button>
             </div>
           </div>

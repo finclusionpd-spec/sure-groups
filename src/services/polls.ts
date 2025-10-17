@@ -1,5 +1,4 @@
 import { PollData } from '../types';
-import { addNotification } from './notifications';
 
 const POLLS_KEY = 'sure-polls';
 const USER_VOTES_KEY = (userId: string) => `sure-poll-votes-${userId}`;
@@ -158,12 +157,12 @@ export function notifyPollsIfNeeded(userId: string) {
     const toMark: string[] = [];
     all.forEach(p => {
       if (p.status === 'active' && !seen.has(`active:${p.id}`)) {
-        addNotification({ title: 'New Poll Available', message: p.title, type: 'group', priority: 'medium', actionUrl: '/dashboard' });
+        // New poll available
         toMark.push(`active:${p.id}`);
       }
       const end = new Date(p.endDate).getTime();
       if (p.status === 'active' && end < soon && !seen.has(`closing:${p.id}`)) {
-        addNotification({ title: 'Poll Closing Soon', message: p.title, type: 'group', priority: 'low', actionUrl: '/dashboard' });
+        // Poll closing soon
         toMark.push(`closing:${p.id}`);
       }
     });

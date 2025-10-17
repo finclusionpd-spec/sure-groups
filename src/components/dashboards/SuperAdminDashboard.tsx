@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '../common/Header';
+import { KycBanner } from '../common/KycBanner';
 import { Sidebar } from '../common/Sidebar';
 import { MetricCard } from '../common/MetricCard';
 import { FeatureRouter } from '../common/FeatureRouter';
@@ -19,64 +21,109 @@ import {
   ArrowRight,
   Bell,
   Clock,
-  Activity
+  Activity,
+  Crown,
+  UserCheck,
+  DollarSign,
+  Wallet,
+  AlertCircle,
+  PieChart,
+  TrendingDown,
+  Eye,
+  Key,
+  Search,
+  Globe,
+  Layers
 } from 'lucide-react';
 
 export const SuperAdminDashboard: React.FC = () => {
   const navigation = getSuperAdminNavigation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
+
+  // Handle URL-based routing
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/superadmin/dashboard' || path === '/superadmin') {
+      setActiveFeature(null);
+    } else {
+      const featureId = path.replace('/superadmin/', '');
+      if (featureId && featureId !== 'dashboard') {
+        setActiveFeature(featureId);
+      }
+    }
+  }, [location.pathname]);
+
+  // Handle dashboard navigation specifically
+  const handleDashboardClick = () => {
+    setActiveFeature(null);
+    navigate('/superadmin/dashboard');
+  };
+
+  // Handle feature selection with URL updates
+  const handleFeatureSelect = (featureId: string) => {
+    if (featureId === 'dashboard') {
+      handleDashboardClick();
+    } else {
+      setActiveFeature(featureId);
+      navigate(`/superadmin/${featureId}`);
+    }
+  };
   
   const metrics: DashboardMetric[] = [
     { title: 'Total Users', value: '24,891', change: '+12%', trend: 'up' },
+    { title: 'Active Vendors', value: '1,247', change: '+8%', trend: 'up' },
+    { title: 'Pending Approvals', value: '156', change: '-5%', trend: 'down' },
+    { title: 'Total Transactions', value: '$2.4M', change: '+18%', trend: 'up' },
+    { title: 'Wallet Balances', value: '$847K', change: '+15%', trend: 'up' },
+    { title: 'Disputes Logged', value: '23', change: '-12%', trend: 'down' },
     { title: 'System Health', value: '99.9%', change: '+0.1%', trend: 'up' },
-    { title: 'Active Sessions', value: '1,247', change: '+8%', trend: 'up' },
-    { title: 'Security Score', value: '94/100', change: '+2', trend: 'up' },
-    { title: 'Open Incidents', value: '3', change: '-5', trend: 'down' },
-    { title: 'System Uptime', value: '99.8%', change: '+0.2%', trend: 'up' }
+    { title: 'Reports Generated', value: '1,847', change: '+25%', trend: 'up' }
   ];
 
   const quickActions = [
     { 
-      id: 'manage-users', 
-      label: 'Manage Users', 
+      id: 'view-all-users', 
+      label: 'View All Users', 
       icon: Users, 
-      color: 'bg-blue-500',
-      action: () => setActiveFeature('user-management')
+      color: 'bg-[#098DCF] hover:bg-[#0F2A75]',
+      action: () => handleFeatureSelect('user-management')
     },
     { 
-      id: 'system-settings', 
-      label: 'System Settings', 
-      icon: Settings, 
-      color: 'bg-green-500',
-      action: () => setActiveFeature('system-settings')
+      id: 'manage-roles', 
+      label: 'Manage Roles & Permissions', 
+      icon: Key, 
+      color: 'bg-[#098DCF] hover:bg-[#0F2A75]',
+      action: () => handleFeatureSelect('rbac-management')
     },
     { 
-      id: 'security-center', 
-      label: 'Security Center', 
-      icon: Shield, 
-      color: 'bg-red-500',
-      action: () => setActiveFeature('security-management')
+      id: 'review-kyc', 
+      label: 'Review KYC/KYB', 
+      icon: UserCheck, 
+      color: 'bg-[#098DCF] hover:bg-[#0F2A75]',
+      action: () => handleFeatureSelect('kyc-management')
     },
     { 
-      id: 'system-monitoring', 
-      label: 'System Monitor', 
+      id: 'approve-requests', 
+      label: 'Approve Pending Requests', 
+      icon: CheckCircle, 
+      color: 'bg-[#098DCF] hover:bg-[#0F2A75]',
+      action: () => handleFeatureSelect('approval-workflow')
+    },
+    { 
+      id: 'system-health', 
+      label: 'Check System Health', 
+      icon: Server, 
+      color: 'bg-[#098DCF] hover:bg-[#0F2A75]',
+      action: () => handleFeatureSelect('system-health')
+    },
+    { 
+      id: 'access-reports', 
+      label: 'Access Reports', 
       icon: BarChart3, 
-      color: 'bg-purple-500',
-      action: () => setActiveFeature('system-monitoring')
-    },
-    { 
-      id: 'audit-logs', 
-      label: 'Audit Logs', 
-      icon: FileText, 
-      color: 'bg-orange-500',
-      action: () => setActiveFeature('audit-logs')
-    },
-    { 
-      id: 'backup-recovery', 
-      label: 'Backup & Recovery', 
-      icon: Database, 
-      color: 'bg-indigo-500',
-      action: () => setActiveFeature('backup-recovery')
+      color: 'bg-[#098DCF] hover:bg-[#0F2A75]',
+      action: () => handleFeatureSelect('analytics-reports')
     }
   ];
 
@@ -132,12 +179,9 @@ export const SuperAdminDashboard: React.FC = () => {
     { name: 'File Storage', status: 'operational', uptime: '99.9%' }
   ];
 
-  const handleFeatureSelect = (featureId: string) => {
-    setActiveFeature(featureId);
-  };
-
   const handleBackToDashboard = () => {
     setActiveFeature(null);
+    navigate('/superadmin/dashboard');
   };
 
   const handleQuickAction = (action: () => void) => {
@@ -174,6 +218,7 @@ export const SuperAdminDashboard: React.FC = () => {
         <Header title={activeFeature ? "System Administration" : "System Overview"} />
         
         <main className="flex-1 overflow-y-auto p-6">
+          <KycBanner />
           {activeFeature ? (
             <div>
               <button
@@ -187,8 +232,19 @@ export const SuperAdminDashboard: React.FC = () => {
           ) : (
             <div className="max-w-7xl mx-auto">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">System Administration</h2>
-                <p className="text-gray-600">Monitor and manage the entire SureGroups platform</p>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-[#0F2A75] rounded-lg">
+                    <Crown className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-[#0F2A75] mb-1" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                      Super Admin Dashboard
+                    </h2>
+                    <p className="text-[#098DCF] text-lg" style={{ fontFamily: 'Molde Semi Expanded Regular' }}>
+                      Monitor and manage the entire SureGroups platform
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Critical Alerts Banner */}
@@ -212,38 +268,74 @@ export const SuperAdminDashboard: React.FC = () => {
 
               {/* Quick Actions */}
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-xl font-bold text-[#0F2A75] mb-6" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                  Quick Actions
+                </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   {quickActions.map((action) => (
                     <button
                       key={action.id}
                       onClick={() => handleQuickAction(action.action)}
-                      className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-all duration-200 group"
+                      className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-xl hover:border-[#098DCF] transition-all duration-300 group"
                     >
-                      <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform`}>
-                        <action.icon className="w-6 h-6 text-white" />
+                      <div className={`w-14 h-14 ${action.color} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <action.icon className="w-7 h-7 text-white" />
                       </div>
-                      <p className="text-sm font-medium text-gray-900 text-center">{action.label}</p>
+                      <p className="text-sm font-bold text-[#0F2A75] text-center group-hover:text-[#098DCF] transition-colors" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                        {action.label}
+                      </p>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Metrics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {metrics.map((metric, index) => (
-                  <MetricCard key={index} metric={metric} />
-                ))}
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-[#0F2A75] mb-6" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                  Platform Metrics
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {metrics.map((metric, index) => {
+                    const icons = [Users, Shield, Clock, DollarSign, Wallet, AlertCircle, Server, FileText];
+                    const IconComponent = icons[index] || BarChart3;
+                    
+                    return (
+                      <div key={index} className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all duration-300">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="p-3 bg-[#098DCF] bg-opacity-10 rounded-xl">
+                            <IconComponent className="w-6 h-6 text-[#098DCF]" />
+                          </div>
+                          <div className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                            metric.trend === 'up' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {metric.change}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-[#0F2A75] mb-1" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                            {metric.title}
+                          </h4>
+                          <p className="text-2xl font-bold text-[#098DCF]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                            {metric.value}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* System Status & Recent Activity */}
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-xl border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">System Services</h3>
+                <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all duration-300">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                      System Services
+                    </h3>
                     <button 
                       onClick={() => setActiveFeature('system-monitoring')}
-                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                      className="text-[#098DCF] hover:text-[#0F2A75] text-sm font-bold flex items-center transition-colors"
+                      style={{ fontFamily: 'Molde Semi Expanded Bold' }}
                     >
                       View All <ArrowRight className="w-4 h-4 ml-1" />
                     </button>
@@ -269,12 +361,15 @@ export const SuperAdminDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Recent System Activity</h3>
+                <div className="bg-white rounded-2xl border border-[#E8EEF7] p-6 hover:shadow-lg hover:border-[#098DCF] transition-all duration-300">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-[#0F2A75]" style={{ fontFamily: 'Molde Semi Expanded Bold' }}>
+                      Recent System Activity
+                    </h3>
                     <button 
                       onClick={() => setActiveFeature('audit-logs')}
-                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                      className="text-[#098DCF] hover:text-[#0F2A75] text-sm font-bold flex items-center transition-colors"
+                      style={{ fontFamily: 'Molde Semi Expanded Bold' }}
                     >
                       View All <ArrowRight className="w-4 h-4 ml-1" />
                     </button>

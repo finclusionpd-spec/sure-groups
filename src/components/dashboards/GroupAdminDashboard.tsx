@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from '../common/Header';
+import { KycBanner } from '../common/KycBanner';
 import { Sidebar } from '../common/Sidebar';
 import { MetricCard } from '../common/MetricCard';
 import { FeatureRouter } from '../common/FeatureRouter';
@@ -38,7 +39,7 @@ export const GroupAdminDashboard: React.FC = () => {
       label: 'Create Group', 
       icon: Settings, 
       color: 'bg-blue-500',
-      action: () => setActiveFeature('group-setup')
+      action: () => setActiveFeature('group-management')
     },
     { 
       id: 'manage-members', 
@@ -175,6 +176,7 @@ export const GroupAdminDashboard: React.FC = () => {
         <Header title={activeFeature ? "Group Administration" : "Group Admin Dashboard"} />
         
         <main className="flex-1 overflow-y-auto p-6">
+          <KycBanner />
           {activeFeature ? (
             <div>
               <button

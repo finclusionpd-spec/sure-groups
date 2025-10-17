@@ -25,7 +25,33 @@ import {
   Heart,
   MapPin,
   Zap,
-  Database
+  Database,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  UserCheck,
+  Key,
+  UserCog,
+  Globe,
+  Layers,
+  CheckCircle,
+  Search,
+  AlertTriangle,
+  Wallet,
+  Lock,
+  Percent,
+  Plug,
+  Code,
+  Wrench,
+  Store,
+  Mail,
+  Template,
+  HardDrive,
+  Activity,
+  Crown,
+  PieChart,
+  Headphones,
+  Palette
 } from 'lucide-react';
 import { NavigationGroup } from '../types';
 
@@ -91,17 +117,16 @@ export const getGroupAdminNavigation = (): NavigationGroup[] => [
     title: 'Dashboard & Overview',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: Home },
-      { id: 'user-tour', label: 'User Tour Guide', icon: HelpCircle },
-      { id: 'group-overview', label: 'Group Overview', icon: Users }
+      { id: 'user-tour', label: 'User Tour Guide', icon: HelpCircle }
     ]
   },
   {
     title: 'Group Management',
     items: [
       { id: 'group-management', label: 'Group Management', icon: Users },
-      { id: 'group-setup', label: 'Group Setup', icon: Settings },
       { id: 'membership-management', label: 'Membership Management', icon: UserPlus },
       { id: 'approval-workflow', label: 'Approval Workflow', icon: Shield },
+      { id: 'association-registration', label: 'Association Registration', icon: Building2 },
       { id: 'events', label: 'Events Management', icon: Calendar },
       { id: 'votings', label: 'Voting Management', icon: Target },
       { id: 'content-oversight', label: 'Content Oversight', icon: MessageSquare }
@@ -146,6 +171,12 @@ export const getGroupAdminNavigation = (): NavigationGroup[] => [
 
 export const getProductAdminNavigation = (): NavigationGroup[] => [
   {
+    title: 'Dashboard & Overview',
+    items: [
+      { id: 'platform-overview', label: 'Platform Overview', icon: BarChart3 }
+    ]
+  },
+  {
     title: 'Platform Management',
     items: [
       { id: 'group-admin-management', label: 'Group Admin Management', icon: Users },
@@ -166,6 +197,12 @@ export const getProductAdminNavigation = (): NavigationGroup[] => [
     ]
   },
   {
+    title: 'Analytics & Reports',
+    items: [
+      { id: 'analytics-reports', label: 'Analytics & Reports', icon: TrendingUp }
+    ]
+  },
+  {
     title: 'System Oversight',
     items: [
       { id: 'database-management', label: 'Database Management', icon: Database },
@@ -178,34 +215,76 @@ export const getProductAdminNavigation = (): NavigationGroup[] => [
 
 export const getSuperAdminNavigation = (): NavigationGroup[] => [
   {
-    title: 'Platform Control',
+    title: 'Dashboard',
     items: [
-      { id: 'feature-management', label: 'Feature Management', icon: Settings },
-      { id: 'rbac-management', label: 'RBAC Management', icon: Shield },
-      { id: 'regional-management', label: 'Regional Management', icon: MapPin }
+      { id: 'dashboard', label: 'Super Admin Dashboard', icon: Crown }
     ]
   },
   {
-    title: 'User Management',
+    title: 'User & Access Control',
     items: [
       { id: 'admin-user-management', label: 'Admin User Management', icon: Users },
-      { id: 'kyc-management', label: 'KYC Management', icon: Shield },
-      { id: 'wallet-management', label: 'Wallet Management', icon: CreditCard }
+      { id: 'rbac-management', label: 'RBAC - Access / Roles & Permission', icon: Key },
+      { id: 'user-management', label: 'User Management', icon: UserCog },
+      { id: 'profile-settings', label: 'Profile Setting / Management', icon: Settings }
     ]
   },
   {
-    title: 'System Management',
+    title: 'Platform Management',
     items: [
-      { id: 'ticketing-system', label: 'Ticketing System', icon: FileText },
-      { id: 'group-management', label: 'Group Management', icon: Users },
-      { id: 'event-management', label: 'Event Management', icon: Calendar }
+      { id: 'regional-management', label: 'Regional Management', icon: Globe },
+      { id: 'bulk-historical-data', label: 'Bulk Historical Data Management System', icon: Layers },
+      { id: 'approval-workflow', label: 'Approval Work Flow Management', icon: CheckCircle }
     ]
   },
   {
-    title: 'Analytics & Finance',
+    title: 'Identity & Compliance',
+    items: [
+      { id: 'kyc-management', label: 'KYC / KYB Management', icon: UserCheck },
+      { id: 'background-check', label: 'Background Check Management System', icon: Search },
+      { id: 'dispute-management', label: 'Dispute Management', icon: AlertTriangle }
+    ]
+  },
+  {
+    title: 'Finance & Transactions',
     items: [
       { id: 'transaction-management', label: 'Transaction Management', icon: DollarSign },
-      { id: 'analytics-reporting', label: 'Analytics & Reporting', icon: BarChart3 }
+      { id: 'wallet-management', label: 'Wallet Management', icon: Wallet },
+      { id: 'escrow-management', label: 'Escrow Management', icon: Lock },
+      { id: 'subscription-fee', label: 'Subscription & Fee Management', icon: Percent }
+    ]
+  },
+  {
+    title: 'Integrations & Developer Tools',
+    items: [
+      { id: 'third-party-integration', label: 'Third Party Integration Management', icon: Plug },
+      { id: 'api-integration', label: 'API Integration Management', icon: Code },
+      { id: 'developer-tools', label: 'Developer Tools and Sandbox Management', icon: Wrench }
+    ]
+  },
+  {
+    title: 'Marketplace & Engagement',
+    items: [
+      { id: 'marketplace-management', label: 'MarketPlace Management System', icon: Store },
+      { id: 'chat-management', label: 'Chat Management', icon: MessageSquare },
+      { id: 'notification-management', label: 'Notification Management', icon: Bell },
+      { id: 'email-template', label: 'Email & Template Management', icon: Mail }
+    ]
+  },
+  {
+    title: 'System & Data',
+    items: [
+      { id: 'database-management', label: 'Data Base Management', icon: Database },
+      { id: 'system-health', label: 'System Health Check (Analytics)', icon: Activity },
+      { id: 'system-log', label: 'System Log & Configuration', icon: FileText },
+      { id: 'report-analytics', label: 'Report & Analytics Management', icon: PieChart }
+    ]
+  },
+  {
+    title: 'Support & Customization',
+    items: [
+      { id: 'ticketing-system', label: 'Ticketing System Management', icon: Headphones },
+      { id: 'white-labeling', label: 'White Labelling & Platform Customization Mgt', icon: Palette }
     ]
   }
 ];

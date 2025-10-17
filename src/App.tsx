@@ -2,13 +2,16 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LandingPage } from './components/pages/LandingPage';
-import { SignUpForm } from './components/auth/SignUpForm';
-import { LoginForm } from './components/auth/LoginForm';
+import { EnhancedLoginForm } from './components/auth/EnhancedLoginForm';
 import { ForgotPasswordForm } from './components/auth/ForgotPasswordForm';
 import { EmailVerificationPage } from './components/auth/EmailVerificationPage';
 import { DemoRoleSelection } from './components/auth/DemoRoleSelection';
+import SignUpWizard from './components/auth/SignUpWizard';
 import { DashboardRouter } from './components/common/DashboardRouter';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { SuperAdminDashboard } from './components/dashboards/SuperAdminDashboard';
+import KycFlowPage from './components/pages/KycFlowPage';
+import TourPage from './components/pages/TourPage';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -16,16 +19,11 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route 
-        path="/signup" 
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpForm />
-        } 
-      />
+      <Route path="/signup" element={<SignUpWizard />} />
       <Route 
         path="/login" 
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginForm />
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <EnhancedLoginForm />
         } 
       />
       <Route 
@@ -56,6 +54,16 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/superadmin/*" 
+        element={
+          <ProtectedRoute allowedRoles={['super-admin']}>
+            <SuperAdminDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="/kyc" element={<ProtectedRoute><KycFlowPage /></ProtectedRoute>} />
+      <Route path="/tour" element={<ProtectedRoute><TourPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

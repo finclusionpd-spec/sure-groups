@@ -3,7 +3,6 @@ import { Search, Plus, Calendar, MapPin, Users, Clock, Edit, Trash2, Eye, Calend
 import { EventData } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { createEvent as svcCreateEvent, updateEvent as svcUpdateEvent, deleteEvent as svcDeleteEvent, listEvents as svcListEvents } from '../../services/events';
-import { addNotification } from '../../services/notifications';
 
 export const EventManagement: React.FC = () => {
   const { user } = useAuth();
@@ -95,14 +94,7 @@ export const EventManagement: React.FC = () => {
     } as any;
     const created = svcCreateEvent(event);
     setEvents(prev => [created, ...prev]);
-    addNotification({
-      title: 'New Event Created',
-      message: `${created.title} scheduled on ${created.date} at ${created.time}`,
-      type: 'event',
-      priority: 'medium',
-      actionUrl: '/dashboard',
-      groupName: created.groupName,
-    });
+    // Event created successfully
     setNewEvent({ title: '', description: '', date: '', time: '', location: '', groupId: '1', maxAttendees: '', bannerUrl: '', rsvpMode: 'open' });
     setShowCreateModal(false);
   };
@@ -110,13 +102,7 @@ export const EventManagement: React.FC = () => {
   const handleDeleteEvent = (eventId: string) => {
     svcDeleteEvent(eventId);
     setEvents(events.filter(event => event.id !== eventId));
-    addNotification({
-      title: 'Event Cancelled',
-      message: 'An event was removed by the admin',
-      type: 'event',
-      priority: 'high',
-      actionUrl: '/dashboard'
-    });
+    // Event deleted successfully
   };
 
   const handleSaveEditEvent = () => {

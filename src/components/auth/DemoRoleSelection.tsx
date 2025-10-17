@@ -18,8 +18,12 @@ export const DemoRoleSelection: React.FC = () => {
     if (!didAuto.current && roleParam && allowed.includes(roleParam)) {
       didAuto.current = true;
       startDemo(roleParam);
-      // Use replace to avoid history loops
-      navigate('/dashboard', { replace: true });
+      // Redirect Super Admin to dedicated route, others to dashboard
+      if (roleParam === 'super-admin') {
+        navigate('/superadmin/dashboard', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [roleParam, startDemo, navigate]);
 

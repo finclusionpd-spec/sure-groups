@@ -1,7 +1,12 @@
 import React from 'react';
 import { UserManagement } from '../features/UserManagement';
-import { KYCManagement } from '../features/KYCManagement';
+import { KycKybManagement } from '../features/KycKybManagement';
 import { WalletManagement } from '../features/WalletManagement';
+import { ChatManagement } from '../features/ChatManagement';
+import { WalletManagementAdmin } from '../features/WalletManagementAdmin';
+import { MarketplaceManagementAdmin } from '../features/MarketplaceManagementAdmin';
+import { CalendarManagementAdmin } from '../features/CalendarManagementAdmin';
+import { PlatformOverview } from '../features/PlatformOverview';
 import { TicketingSystem } from '../features/TicketingSystem';
 import { GroupManagement } from '../features/GroupManagement';
 import { EventManagement } from '../features/EventManagement';
@@ -20,6 +25,7 @@ import { DiscountsOffers } from '../features/DiscountsOffers';
 import { ProfessionalServices } from '../features/ProfessionalServices';
 import { PriorityInvitations } from '../features/PriorityInvitations';
 import { DisputeManagement } from '../features/DisputeManagement';
+import { SuperAdminDisputeManagement } from '../features/SuperAdminDisputeManagement';
 import { ReportsFlags } from '../features/ReportsFlags';
 import { Wallet } from '../features/Wallet';
 import { RewardsReferrals } from '../features/RewardsReferrals';
@@ -27,7 +33,8 @@ import { NotificationsAlerts } from '../features/NotificationsAlerts';
 import { ChatMessaging } from '../features/ChatMessaging';
 import { RatingsReviews } from '../features/RatingsReviews';
 import { ProfileSettings } from '../features/ProfileSettings';
-import { GroupSetup } from '../features/GroupSetup';
+import { ProfileManagement } from '../features/ProfileManagement';
+import { UnifiedProfileSettings } from '../features/UnifiedProfileSettings';
 import { MembershipManagement } from '../features/MembershipManagement';
 import { PerformanceTracking } from '../features/PerformanceTracking';
 import { ContentOversight } from '../features/ContentOversight';
@@ -35,6 +42,7 @@ import { BenefitManagement } from '../features/BenefitManagement';
 import { MarketplaceManagement } from '../features/MarketplaceManagement';
 import { VendorTourGuide } from '../features/VendorTourGuide';
 import { VendorServices } from '../features/VendorServices';
+import { VendorManagement } from '../features/VendorManagement';
 import { VendorOrders } from '../features/VendorOrders';
 import { VendorTransactions } from '../features/VendorTransactions';
 import { VendorMarketing } from '../features/VendorMarketing';
@@ -56,7 +64,6 @@ import { ComplianceCenter } from '../features/ComplianceCenter';
 import { DeveloperRatings } from '../features/DeveloperRatings';
 // removed unused imports DeveloperChat, HelpCenter
 import { VendorMarketplace } from '../features/VendorMarketplace';
-import { GroupOverview } from '../features/GroupOverview';
 import { SystemSettings } from '../features/SystemSettings';
 import { SecurityManagement } from '../features/SecurityManagement';
 import { AuditLogs } from '../features/AuditLogs';
@@ -68,16 +75,39 @@ import { Votings } from '../features/Votings';
 import { Donations } from '../features/Donations';
 import { DonationManagement } from '../features/DonationManagement';
 import { ApprovalWorkflow } from '../features/ApprovalWorkflow';
+import { SuperAdminApprovalWorkflowManagement } from '../features/SuperAdminApprovalWorkflowManagement';
 import { VendorWallet } from '../features/VendorWallet';
+import { AssociationRegistrationPage } from '../features/AssociationRegistration';
+import { AssociationRegistrationManagement } from '../features/AssociationRegistrationManagement';
+import { AnalyticsReports } from '../features/AnalyticsReports';
+import { SuperAdminDashboard } from '../dashboards/SuperAdminDashboard';
+import { BulkHistoricalDataManagement } from '../features/BulkHistoricalDataManagement';
+import { BackgroundCheckManagement } from '../features/BackgroundCheckManagement';
+import { EscrowManagement } from '../features/EscrowManagement';
+import { SuperAdminEscrowManagement } from '../features/SuperAdminEscrowManagement';
+import { SuperAdminSubscriptionFeeManagement } from '../features/SuperAdminSubscriptionFeeManagement';
+import { SubscriptionFeeManagement } from '../features/SubscriptionFeeManagement';
+import { ThirdPartyIntegrationManagement } from '../features/ThirdPartyIntegrationManagement';
+import { SuperAdminThirdPartyIntegrationManagement } from '../features/SuperAdminThirdPartyIntegrationManagement';
+import { APIIntegrationManagement } from '../features/APIIntegrationManagement';
+import { DeveloperToolsSandboxManagement } from '../features/DeveloperToolsSandboxManagement';
+import { EmailTemplateManagement } from '../features/EmailTemplateManagement';
+import { SystemHealthCheck } from '../features/SystemHealthCheck';
+import { SystemLogConfiguration } from '../features/SystemLogConfiguration';
+import { ReportAnalyticsManagement } from '../features/ReportAnalyticsManagement';
+import { WhiteLabelingCustomization } from '../features/WhiteLabelingCustomization';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface FeatureRouterProps {
   featureId: string;
+  onNavigate?: (featureId: string) => void;
 }
 
-export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
+export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId, onNavigate }) => {
   const { user } = useAuth();
   switch (featureId) {
+    case 'platform-overview':
+      return <PlatformOverview onNavigate={onNavigate} />;
     case 'user-tour':
       return <UserTourGuide />;
     case 'my-groups':
@@ -97,7 +127,7 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'orders':
       return <MyOrders />;
     case 'dispute-management':
-      return <DisputeManagement />;
+      return user?.role === 'super-admin' ? <SuperAdminDisputeManagement /> : <DisputeManagement />;
     case 'reports-flags':
       return <ReportsFlags />;
     case 'wallet':
@@ -115,7 +145,8 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'ratings-reviews':
       return <RatingsReviews />;
     case 'profile-settings':
-      return <ProfileSettings />;
+      // Use ProfileManagement for Super Admin, UnifiedProfileSettings for others
+      return user?.role === 'super-admin' ? <ProfileManagement /> : <UnifiedProfileSettings />;
     case 'meetings':
       return <Meetings />;
     case 'votings':
@@ -180,8 +211,6 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <NotificationsAlerts />;
     case 'chat':
       return <ChatMessaging />;
-    case 'group-overview':
-      return <GroupOverview />;
     case 'user-management':
       return <UserManagement />;
     case 'group-admin-management':
@@ -189,15 +218,15 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'members-management':
       return <UserManagement />;
     case 'vendors-management':
-      return <VendorServices />;
+      return <VendorManagement />;
     case 'chat-management':
-      return <ChatMessaging />;
+      return <ChatManagement />;
     case 'wallet-management':
-      return <WalletManagement />;
+      return <WalletManagementAdmin />;
     case 'marketplace-management':
-      return <MarketplaceManagement />;
+      return <MarketplaceManagementAdmin />;
     case 'calendar-management':
-      return <EventManagement />;
+      return <CalendarManagementAdmin />;
     case 'system-settings':
       return <SystemSettings />;
     case 'security-management':
@@ -213,13 +242,13 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
     case 'admin-user-management':
       return <AdminUserManagement />;
     case 'kyc-management':
-      return <KYCManagement />;
+      return <KycKybManagement />;
     case 'ticketing-system':
       return <TicketingSystem />;
     case 'group-management':
       return <GroupManagement />;
     case 'approval-workflow':
-      return <ApprovalWorkflow />;
+      return user?.role === 'super-admin' ? <SuperAdminApprovalWorkflowManagement /> : <ApprovalWorkflow />;
     case 'event-management':
       return <EventManagement />;
     case 'feature-management':
@@ -241,8 +270,6 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
           </div>
         </div>
       );
-    case 'group-setup':
-      return <GroupSetup />;
     case 'membership-management':
       return <MembershipManagement />;
     case 'content-oversight':
@@ -254,6 +281,56 @@ export const FeatureRouter: React.FC<FeatureRouterProps> = ({ featureId }) => {
       return <BenefitManagement />;
     case 'donation-management':
       return <DonationManagement />;
+    case 'association-registration':
+      return <AssociationRegistrationPage />;
+    case 'association-registration-management':
+      return <AssociationRegistrationManagement />;
+    case 'analytics-reports':
+      return <AnalyticsReports />;
+    
+    // Super Admin Features - Dashboard
+    case 'dashboard':
+      return <div className="p-6 text-center">
+        <div className="text-lg text-gray-600">Welcome to Super Admin Dashboard</div>
+        <div className="text-sm text-gray-500 mt-2">Use the sidebar to navigate to specific features</div>
+      </div>;
+    
+    // Super Admin Features - User & Access Control
+    case 'bulk-historical-data':
+      return <BulkHistoricalDataManagement />;
+    case 'background-check':
+      return <BackgroundCheckManagement />;
+    
+    // Super Admin Features - Finance & Transactions
+    case 'escrow-management':
+      return user?.role === 'super-admin' ? <SuperAdminEscrowManagement /> : <EscrowManagement />;
+    case 'subscription-fee':
+      return user?.role === 'super-admin' ? <SuperAdminSubscriptionFeeManagement /> : <SubscriptionFeeManagement />;
+    
+    // Super Admin Features - Integrations & Developer Tools
+    case 'third-party-integration':
+      return user?.role === 'super-admin' ? <SuperAdminThirdPartyIntegrationManagement /> : <ThirdPartyIntegrationManagement />;
+    case 'api-integration':
+      return <APIIntegrationManagement />;
+    case 'developer-tools':
+      return <DeveloperToolsSandboxManagement />;
+    
+    // Super Admin Features - Marketplace & Engagement
+    case 'email-template':
+      return <EmailTemplateManagement />;
+    
+    // Super Admin Features - System & Data
+    case 'system-health':
+      return <SystemHealthCheck />;
+    case 'system-log':
+      return <SystemLogConfiguration />;
+    case 'report-analytics':
+      return <ReportAnalyticsManagement />;
+    
+    // Super Admin Features - Support & Customization
+    case 'white-labeling':
+      return <WhiteLabelingCustomization />;
+    
     default:
       return (
         <div className="p-6">

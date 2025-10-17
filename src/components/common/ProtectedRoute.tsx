@@ -25,9 +25,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (!isDemoMode && requireAuth && !isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  // Authentication gating disabled to allow public access without login
+  // Previously redirected to /login when not authenticated
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />;

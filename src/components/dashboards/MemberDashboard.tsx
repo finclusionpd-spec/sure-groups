@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from '../common/Header';
+import { KycBanner } from '../common/KycBanner';
+import { useAuth } from '../../contexts/AuthContext';
 import { Sidebar } from '../common/Sidebar';
 import { MetricCard } from '../common/MetricCard';
 import { FeatureRouter } from '../common/FeatureRouter';
@@ -17,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export const MemberDashboard: React.FC = () => {
+  const { user } = useAuth();
   const navigation = getMemberNavigation();
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
   
@@ -117,6 +120,7 @@ export const MemberDashboard: React.FC = () => {
         <Header title={activeFeature ? "Member Portal" : "My Dashboard"} />
         
         <main className="flex-1 overflow-y-auto p-6">
+          {!activeFeature && <KycBanner />}
           {activeFeature ? (
             <div>
               <button
